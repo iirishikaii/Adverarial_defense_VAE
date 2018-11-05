@@ -1,0 +1,313 @@
+Adversarial model trained on 10K,40K 
+
+original image list:  [2965, 8077, 5627, 1005, 6653, 7375, 7741, 2640, 7528, 8036]
+target image list:  [1369, 906, 553, 5337, 2952, 3529, 4312, 6283, 9209, 5579]
+orig_img 2965
+target_img 1369
+bestC 1179.5997
+orig_reconstruction_dist 1.8847588
+target_reconstruction_dist 2.4892275
+best noise_dist  [3.19797238]
+best orig_dist  [7.155384]
+best adv_dist [6.045105]
+best target_recon_dist [2.4892275]
+best recon_dist [6.61030827]
+best orig_target_dist [9.198647]
+best orig_target_recon_dist [9.549746]
+best target_orig_recon_dist [9.665964]
+Iter 0 Time 81.08171200752258 sec
+############################################################
+orig_img 8077
+target_img 906
+bestC 669.87823
+orig_reconstruction_dist 3.177771
+target_reconstruction_dist 2.3079634
+best noise_dist  [5.1501511]
+best orig_dist  [8.849125]
+best adv_dist [7.3693438]
+best target_recon_dist [2.3079634]
+best recon_dist [7.33935641]
+best orig_target_dist [11.581866]
+best orig_target_recon_dist [12.184499]
+best target_orig_recon_dist [11.652209]
+Iter 1 Time 42.52839493751526 sec
+############################################################
+orig_img 5627
+target_img 553
+bestC 2077.1765
+orig_reconstruction_dist 2.451324
+target_reconstruction_dist 3.2921455
+best noise_dist  [2.77851584]
+best orig_dist  [7.2728024]
+best adv_dist [6.1557345]
+best target_recon_dist [3.2921455]
+best recon_dist [6.56120638]
+best orig_target_dist [9.80623]
+best orig_target_recon_dist [10.099181]
+best target_orig_recon_dist [10.21086]
+Iter 2 Time 55.40671491622925 sec
+############################################################
+orig_img 1005
+target_img 5337
+bestC 1179.5997
+orig_reconstruction_dist 2.017176
+target_reconstruction_dist 2.3427157
+best noise_dist  [3.76924785]
+best orig_dist  [9.601717]
+best adv_dist [6.106358]
+best target_recon_dist [2.3427157]
+best recon_dist [8.41156555]
+best orig_target_dist [11.541479]
+best orig_target_recon_dist [11.882791]
+best target_orig_recon_dist [12.106469]
+Iter 3 Time 55.978200912475586 sec
+############################################################
+orig_img 6653
+target_img 2952
+bestC 1179.5997
+orig_reconstruction_dist 2.017214
+target_reconstruction_dist 2.831753
+best noise_dist  [3.5012895]
+best orig_dist  [9.320807]
+best adv_dist [7.398153]
+best target_recon_dist [2.831753]
+best recon_dist [8.08145431]
+best orig_target_dist [11.54526]
+best orig_target_recon_dist [11.896072]
+best target_orig_recon_dist [11.961334]
+Iter 4 Time 71.64555406570435 sec
+############################################################
+orig_img 7375
+target_img 3529
+bestC 669.87823
+orig_reconstruction_dist 2.1984107
+target_reconstruction_dist 2.7453153
+best noise_dist  [3.97843617]
+best orig_dist  [7.527726]
+best adv_dist [4.4045773]
+best target_recon_dist [2.7453153]
+best recon_dist [6.41435409]
+best orig_target_dist [8.345946]
+best orig_target_recon_dist [8.85103]
+best target_orig_recon_dist [8.860333]
+Iter 5 Time 60.350228786468506 sec
+############################################################
+orig_img 7741
+target_img 4312
+bestC 1179.5997
+orig_reconstruction_dist 2.8811848
+target_reconstruction_dist 2.3012564
+best noise_dist  [3.62532674]
+best orig_dist  [8.213991]
+best adv_dist [7.454414]
+best target_recon_dist [2.3012564]
+best recon_dist [6.90038508]
+best orig_target_dist [11.356873]
+best orig_target_recon_dist [11.91937]
+best target_orig_recon_dist [11.693343]
+Iter 6 Time 63.790087938308716 sec
+############################################################
+orig_img 2640
+target_img 6283
+bestC 2077.1765
+orig_reconstruction_dist 3.4772995
+target_reconstruction_dist 2.5428214
+best noise_dist  [2.12955249]
+best orig_dist  [7.353813]
+best adv_dist [6.0466022]
+best target_recon_dist [2.5428214]
+best recon_dist [6.83707751]
+best orig_target_dist [9.172746]
+best orig_target_recon_dist [9.572057]
+best target_orig_recon_dist [9.593851]
+Iter 7 Time 50.378894090652466 sec
+############################################################
+orig_img 7528
+target_img 9210
+bestC 669.87823
+orig_reconstruction_dist 4.4026423
+target_reconstruction_dist 3.2970402
+best noise_dist  [3.93938657]
+best orig_dist  [8.189286]
+best adv_dist [6.5694222]
+best target_recon_dist [3.2970402]
+best recon_dist [7.16777125]
+best orig_target_dist [10.288151]
+best orig_target_recon_dist [10.496073]
+best target_orig_recon_dist [10.851972]
+Iter 8 Time 38.3211350440979 sec
+############################################################
+orig_img 8036
+target_img 5579
+bestC 1179.5997
+orig_reconstruction_dist 3.5855436
+target_reconstruction_dist 2.7888005
+best noise_dist  [3.64647116]
+best orig_dist  [9.356182]
+best adv_dist [7.5581465]
+best target_recon_dist [2.7888005]
+best recon_dist [8.0551671]
+best orig_target_dist [11.758713]
+best orig_target_recon_dist [12.260288]
+best target_orig_recon_dist [12.111392]
+Iter 9 Time 56.63910698890686 sec
+############################################################
+
+
+
+
+ADV MODEL
+
+
+original image list:  [2965, 8077, 5627, 1005, 6653, 7375, 7741, 2640, 7528, 8036]
+target image list:  [1369, 906, 553, 5337, 2952, 3529, 4312, 6283, 9209, 5579]
+orig_img 2965
+target_img 1369
+bestC 216.03212
+orig_reconstruction_dist 1.6841259
+target_reconstruction_dist 2.5702987
+best noise_dist  [2.98098968]
+best orig_dist  [8.068986]
+best adv_dist [3.7666879]
+best target_recon_dist [2.5702987]
+best recon_dist [7.36335977]
+best orig_target_dist [9.198647]
+best orig_target_recon_dist [9.526848]
+best target_orig_recon_dist [9.648679]
+Iter 0 Time 61.79669809341431 sec
+############################################################
+orig_img 8077
+target_img 906
+bestC 216.03212
+orig_reconstruction_dist 2.7121305
+target_reconstruction_dist 2.6969001
+best noise_dist  [2.93508664]
+best orig_dist  [8.159701]
+best adv_dist [6.203424]
+best target_recon_dist [2.6969001]
+best recon_dist [7.40716374]
+best orig_target_dist [11.581866]
+best orig_target_recon_dist [11.728551]
+best target_orig_recon_dist [12.098359]
+Iter 1 Time 47.03341197967529 sec
+############################################################
+orig_img 5627
+target_img 553
+bestC 216.03212
+orig_reconstruction_dist 2.0153496
+target_reconstruction_dist 3.443061
+best noise_dist  [2.83726509]
+best orig_dist  [7.5804987]
+best adv_dist [5.311601]
+best target_recon_dist [3.443061]
+best recon_dist [7.10346644]
+best orig_target_dist [9.80623]
+best orig_target_recon_dist [9.977814]
+best target_orig_recon_dist [9.64014]
+Iter 2 Time 45.986839056015015 sec
+############################################################
+orig_img 1005
+target_img 5337
+bestC 122.68164
+orig_reconstruction_dist 1.9221888
+target_reconstruction_dist 2.1311712
+best noise_dist  [3.88671786]
+best orig_dist  [7.622401]
+best adv_dist [7.421728]
+best target_recon_dist [2.1311712]
+best recon_dist [6.71270525]
+best orig_target_dist [11.541479]
+best orig_target_recon_dist [11.833106]
+best target_orig_recon_dist [11.865723]
+Iter 3 Time 46.850929975509644 sec
+############################################################
+orig_img 6653
+target_img 2952
+bestC 216.03212
+orig_reconstruction_dist 2.07989
+target_reconstruction_dist 3.5046484
+best noise_dist  [2.93577386]
+best orig_dist  [8.187833]
+best adv_dist [8.187224]
+best target_recon_dist [3.5046484]
+best recon_dist [7.12264973]
+best orig_target_dist [11.54526]
+best orig_target_recon_dist [11.873973]
+best target_orig_recon_dist [11.751715]
+Iter 4 Time 61.75299787521362 sec
+############################################################
+orig_img 7375
+target_img 3529
+bestC 216.03212
+orig_reconstruction_dist 2.362479
+target_reconstruction_dist 2.6487484
+best noise_dist  [2.34359569]
+best orig_dist  [5.858368]
+best adv_dist [5.4831743]
+best target_recon_dist [2.6487484]
+best recon_dist [5.25074582]
+best orig_target_dist [8.345946]
+best orig_target_recon_dist [8.92994]
+best target_orig_recon_dist [8.506792]
+Iter 5 Time 63.37723898887634 sec
+############################################################
+orig_img 7741
+target_img 4312
+bestC 216.03212
+orig_reconstruction_dist 2.8725166
+target_reconstruction_dist 1.8476688
+best noise_dist  [3.18217047]
+best orig_dist  [8.251879]
+best adv_dist [7.0955896]
+best target_recon_dist [1.8476688]
+best recon_dist [7.24618281]
+best orig_target_dist [11.356873]
+best orig_target_recon_dist [11.456779]
+best target_orig_recon_dist [11.456102]
+Iter 6 Time 54.956594944000244 sec
+############################################################
+orig_img 2640
+target_img 6283
+bestC 216.03212
+orig_reconstruction_dist 3.4189994
+target_reconstruction_dist 2.6332192
+best noise_dist  [2.86936124]
+best orig_dist  [7.686922]
+best adv_dist [4.9027166]
+best target_recon_dist [2.6332192]
+best recon_dist [7.27166525]
+best orig_target_dist [9.172746]
+best orig_target_recon_dist [9.307402]
+best target_orig_recon_dist [9.592894]
+Iter 7 Time 69.9415237903595 sec
+############################################################
+orig_img 7528
+target_img 9210
+bestC 122.68164
+orig_reconstruction_dist 3.9589906
+target_reconstruction_dist 3.9015493
+best noise_dist  [3.16706874]
+best orig_dist  [7.4486322]
+best adv_dist [6.11706]
+best target_recon_dist [3.9015493]
+best recon_dist [6.65014746]
+best orig_target_dist [10.288151]
+best orig_target_recon_dist [10.455865]
+best target_orig_recon_dist [10.528473]
+Iter 8 Time 76.17558002471924 sec
+############################################################
+orig_img 8036
+target_img 5579
+bestC 380.41455
+orig_reconstruction_dist 2.5004063
+target_reconstruction_dist 2.4892616
+best noise_dist  [2.95327133]
+best orig_dist  [8.265705]
+best adv_dist [7.4271817]
+best target_recon_dist [2.4892616]
+best recon_dist [7.39546241]
+best orig_target_dist [11.758713]
+best orig_target_recon_dist [11.666149]
+best target_orig_recon_dist [12.082533]
+Iter 9 Time 63.80981707572937 sec
+############################################################

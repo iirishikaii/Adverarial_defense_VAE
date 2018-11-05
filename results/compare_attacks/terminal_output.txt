@@ -1,0 +1,255 @@
+Using MNIST dataset
+ENC_DENSE1.W (784, 512)
+ENC_DENSE1.b (512,)
+ENC_DENSE2.W (512, 512)
+ENC_DENSE2.b (512,)
+Z.W (512, 20)
+Z.b (20,)
+DEC_DENSE2.W (20, 512)
+DEC_DENSE2.b (512,)
+DEC_DENSE1.W (512, 512)
+DEC_DENSE1.b (512,)
+DEC_X_MU.W (512, 784)
+DEC_X_MU.b (784,)
+original image list:  [7920, 5500, 8382, 1490, 7040, 5230, 2175, 8027, 8048, 448, 2772, 5282, 4992, 941, 9379]
+target image list:  [2717, 2934, 5159, 2362, 1023, 974, 4154, 7465, 550, 6973, 2644, 3927, 2300, 4672, 4043]
+orig_img :  7920
+target_img :  2717
+orig_reconstruction_dist :  1.6835563
+target_reconstruction_dist :  2.8905692
+original_target_dist :  [11.615858]
+orig_target_recon_dist :  [11.929426]
+target_orig_recon_dist :  [12.205984]
+
+bestC :  624.135
+adv_adv_recon_dist :  [7.83630395]
+best noise_dist :   [5.48312082]
+best orig_dist :   [9.7063875]
+best adv_dist :  [5.947895]
+
+Iter 0 Time 72.9888129234314 sec
+############################################################
+orig_img :  5500
+target_img :  2934
+orig_reconstruction_dist :  2.9024816
+target_reconstruction_dist :  2.3431218
+original_target_dist :  [10.470366]
+orig_target_recon_dist :  [10.843545]
+target_orig_recon_dist :  [10.951837]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [8.09601421]
+best noise_dist :   [4.18087084]
+best orig_dist :   [9.4620285]
+best adv_dist :  [6.322603]
+
+Iter 1 Time 63.19021010398865 sec
+############################################################
+orig_img :  8382
+target_img :  5159
+orig_reconstruction_dist :  3.0798845
+target_reconstruction_dist :  2.8130736
+original_target_dist :  [10.710829]
+orig_target_recon_dist :  [11.318377]
+target_orig_recon_dist :  [11.082287]
+
+bestC :  1680.0468
+adv_adv_recon_dist :  [6.81644158]
+best noise_dist :   [2.77927149]
+best orig_dist :   [7.75302]
+best adv_dist :  [7.3824496]
+
+Iter 2 Time 66.16322803497314 sec
+############################################################
+orig_img :  1490
+target_img :  2362
+orig_reconstruction_dist :  2.8655024
+target_reconstruction_dist :  2.0936818
+original_target_dist :  [9.745027]
+orig_target_recon_dist :  [10.237225]
+target_orig_recon_dist :  [10.225021]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [6.3264234]
+best noise_dist :   [3.39848749]
+best orig_dist :   [7.2767262]
+best adv_dist :  [6.794958]
+
+Iter 3 Time 60.561017990112305 sec
+############################################################
+orig_img :  7040
+target_img :  1023
+orig_reconstruction_dist :  3.3309147
+target_reconstruction_dist :  3.4853764
+original_target_dist :  [12.825921]
+orig_target_recon_dist :  [13.157255]
+target_orig_recon_dist :  [13.070903]
+
+bestC :  624.135
+adv_adv_recon_dist :  [7.39699907]
+best noise_dist :   [5.06809746]
+best orig_dist :   [9.2840805]
+best adv_dist :  [9.226451]
+
+Iter 4 Time 61.55955410003662 sec
+############################################################
+orig_img :  5230
+target_img :  974
+orig_reconstruction_dist :  2.3128886
+target_reconstruction_dist :  2.7775176
+original_target_dist :  [10.504415]
+orig_target_recon_dist :  [10.860118]
+target_orig_recon_dist :  [11.026751]
+
+bestC :  1680.0468
+adv_adv_recon_dist :  [6.92213522]
+best noise_dist :   [3.02790729]
+best orig_dist :   [7.760196]
+best adv_dist :  [7.005455]
+
+Iter 5 Time 66.4812240600586 sec
+############################################################
+orig_img :  2175
+target_img :  4154
+orig_reconstruction_dist :  2.1498868
+target_reconstruction_dist :  4.26188
+original_target_dist :  [12.2413845]
+orig_target_recon_dist :  [12.364898]
+target_orig_recon_dist :  [12.545196]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [7.6379773]
+best noise_dist :   [3.83688621]
+best orig_dist :   [8.579885]
+best adv_dist :  [7.416214]
+
+Iter 6 Time 61.59088897705078 sec
+############################################################
+orig_img :  8027
+target_img :  7465
+orig_reconstruction_dist :  2.8537238
+target_reconstruction_dist :  3.1182077
+original_target_dist :  [12.3745365]
+orig_target_recon_dist :  [12.418413]
+target_orig_recon_dist :  [12.625609]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [8.07533121]
+best noise_dist :   [3.68510494]
+best orig_dist :   [9.171549]
+best adv_dist :  [7.77031]
+
+Iter 7 Time 84.96182012557983 sec
+############################################################
+orig_img :  8048
+target_img :  550
+orig_reconstruction_dist :  1.6367581
+target_reconstruction_dist :  3.0512743
+original_target_dist :  [8.071137]
+orig_target_recon_dist :  [8.361475]
+target_orig_recon_dist :  [8.226485]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [5.25595919]
+best noise_dist :   [2.97157819]
+best orig_dist :   [5.880067]
+best adv_dist :  [5.584211]
+
+Iter 8 Time 92.30056285858154 sec
+############################################################
+orig_img :  448
+target_img :  6973
+orig_reconstruction_dist :  2.6245282
+target_reconstruction_dist :  2.8954496
+original_target_dist :  [9.17833]
+orig_target_recon_dist :  [9.5162945]
+target_orig_recon_dist :  [9.331434]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [6.47390931]
+best noise_dist :   [3.01544692]
+best orig_dist :   [7.2540073]
+best adv_dist :  [5.8959484]
+
+Iter 9 Time 58.37685704231262 sec
+############################################################
+orig_img :  2772
+target_img :  2645
+orig_reconstruction_dist :  2.0064616
+target_reconstruction_dist :  2.7305954
+original_target_dist :  [8.04294]
+orig_target_recon_dist :  [8.356316]
+target_orig_recon_dist :  [8.665981]
+
+bestC :  1680.0468
+adv_adv_recon_dist :  [5.02375605]
+best noise_dist :   [2.61036679]
+best orig_dist :   [5.7137303]
+best adv_dist :  [5.554132]
+
+Iter 10 Time 89.93249678611755 sec
+############################################################
+orig_img :  5282
+target_img :  3927
+orig_reconstruction_dist :  2.4563887
+target_reconstruction_dist :  2.4242
+original_target_dist :  [11.123084]
+orig_target_recon_dist :  [11.560406]
+target_orig_recon_dist :  [11.655687]
+
+bestC :  624.135
+adv_adv_recon_dist :  [7.666475]
+best noise_dist :   [5.6156011]
+best orig_dist :   [9.427983]
+best adv_dist :  [6.5659437]
+
+Iter 11 Time 92.12297511100769 sec
+############################################################
+orig_img :  4992
+target_img :  2300
+orig_reconstruction_dist :  2.5793674
+target_reconstruction_dist :  4.0524287
+original_target_dist :  [11.853225]
+orig_target_recon_dist :  [12.539784]
+target_orig_recon_dist :  [12.2195425]
+
+bestC :  624.135
+adv_adv_recon_dist :  [6.90954436]
+best noise_dist :   [4.22384348]
+best orig_dist :   [8.3855715]
+best adv_dist :  [8.373747]
+
+Iter 12 Time 98.10462498664856 sec
+############################################################
+orig_img :  941
+target_img :  4672
+orig_reconstruction_dist :  1.9994322
+target_reconstruction_dist :  3.3064878
+original_target_dist :  [9.4704075]
+orig_target_recon_dist :  [9.787079]
+target_orig_recon_dist :  [10.292343]
+
+bestC :  624.135
+adv_adv_recon_dist :  [6.47852149]
+best noise_dist :   [3.83639829]
+best orig_dist :   [7.5293427]
+best adv_dist :  [6.5535407]
+
+Iter 13 Time 68.15562915802002 sec
+############################################################
+orig_img :  9379
+target_img :  4043
+orig_reconstruction_dist :  4.1878624
+target_reconstruction_dist :  3.8838713
+original_target_dist :  [11.979613]
+orig_target_recon_dist :  [12.067581]
+target_orig_recon_dist :  [12.420008]
+
+bestC :  1024.0
+adv_adv_recon_dist :  [7.78148347]
+best noise_dist :   [3.52377635]
+best orig_dist :   [8.955424]
+best adv_dist :  [8.655252]
+
+Iter 14 Time 88.49165606498718 sec
+############################################################
