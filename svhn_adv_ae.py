@@ -323,7 +323,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
-        plt.imshow(img, cmap='Greys_r')
+        plt.imshow(img)
         plt.title(title)
         plt.axis("off")
         
@@ -334,7 +334,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
-        plt.imshow(img, cmap='Greys_r')
+        plt.imshow(img)
         plt.title(title)
         plt.axis("off")
         
@@ -344,7 +344,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
-        plt.imshow(img, cmap='Greys_r')
+        plt.imshow(img)
         plt.title(title)
         plt.axis("off")
         
@@ -355,7 +355,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
-        plt.imshow(img, cmap='Greys_r')
+        plt.imshow(img)
         plt.title(title)
         plt.axis("off")
 
@@ -366,7 +366,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
-        plt.imshow(img, cmap='Greys_r')
+        plt.imshow(img)
         plt.title(title)
         plt.axis("off")
         
@@ -377,7 +377,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
-        plt.imshow(img, cmap='Greys_r')
+        plt.imshow(img)
         plt.title(title)
         plt.axis("off")
 
