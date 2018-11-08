@@ -36,9 +36,13 @@ matplotlib.use('Agg')
 from mpl_toolkits.mplot3d import Axes3D
 import pylab as plt
 from read_write_model import read_model, write_model
+from time import mktime, gmtime
 
 theano.config.floatX = 'float32'
 
+
+def now():
+    return mktime(gmtime())
 
 # In[2]:
 
