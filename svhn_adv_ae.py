@@ -320,7 +320,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = test_x[orig_img]
         i = 1
         title = "Original Image"
-        img = img.copy().reshape(32, 32)
+        img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
         plt.imshow(img, cmap='Greys_r')
@@ -331,7 +331,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = original_reconstruction
         i = 2
         title = "Original Reconstruction"
-        img = img.copy().reshape(32, 32)
+        img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
         plt.imshow(img, cmap='Greys_r')
@@ -341,7 +341,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = x
         i = 3
         title = "Adversarial noise"
-        img = img.copy().reshape(32, 32)
+        img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
         plt.imshow(img, cmap='Greys_r')
@@ -352,7 +352,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = test_x[target_img]
         i = 4
         title = "Target image"
-        img = img.copy().reshape(32, 32)
+        img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
         plt.imshow(img, cmap='Greys_r')
@@ -363,7 +363,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = test_x[orig_img].flatten()+x
         i = 5
         title = "Adversarial image"
-        img = img.copy().reshape(32, 32)
+        img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
         plt.imshow(img, cmap='Greys_r')
@@ -374,7 +374,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
         img = adv_img
         i = 6
         title = "Adversarial reconstruction"
-        img = img.copy().reshape(32, 32)
+        img = img.copy().reshape(3, 32, 32)
         img = np.clip(img, 0, 1)
         plt.subplot(3, 2, i)
         plt.imshow(img, cmap='Greys_r')
