@@ -305,7 +305,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True, iteration = 1
         plt.axis("off")
 
         #output_dir = '/Users/rishikaagarwal/Desktop/cs597/adv_vae-master/results/' + model_filename +'/'
-        output_dir = 'results/compare_attacks' + model_filename +'/'
+        output_dir = 'results/compare_attacks/' + model_filename +'/'
         fig.savefig(os.path.join(output_dir, (str(iteration)+ '.png')))
         plt.close(fig)
  
