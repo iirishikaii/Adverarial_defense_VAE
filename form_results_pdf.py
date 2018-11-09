@@ -2,8 +2,9 @@ from fpdf import FPDF
 from PIL import Image
 pdf = FPDF()
 
-dir1 = "results/compare_attacks/mnist_ae/"
-dir2 = "results/compare_attacks/mnist_ae_adv_trained/"
+#dir2 = "results/compare_attacks/mnist_ae_adv_trained/"
+#dir1 = "results/compare_attacks/svhn_conv_ae/"
+dir2 = "results/compare_attacks/svhn_ae_adv_trained/"
 cover = Image.open(dir1 + str(0) + ".png")
 width, height = cover.size
 
@@ -23,7 +24,15 @@ for i in range(0,15):
     pdf.image(dir2 + "exp_" + str(i) + "graph2.png", x = 470, y = 680, w = 350, h = 280)
     pdf.add_page()
 
-pdfFileName = "compiled_results"
+x_coord = 70
+y_coord = 30
+for i in range(0,15):
+    
+    pdf.image(dir1 + str(i) + ".png", x = x_coord, y = y_coord,  w = 250, h = 250)
+    pdf.image(dir2 + str(i) + ".png", x = x_coord + 220, y = y_coord, w = 250, h = 250)
+    y_coord = y_coord + 220
+
+pdfFileName = "compiled_results_svhn"
 dir = "results/compare_attacks/"
 pdf.output(dir + pdfFileName + ".pdf", "F")
 

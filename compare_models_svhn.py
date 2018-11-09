@@ -388,7 +388,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
         plt.legend()
         plt.plot()
         #output_dir = '/Users/rishikaagarwal/Desktop/cs597/adv_vae-master/results/' + model_filename + '/'
-        output_dir = 'results/' + model_filename + '/'
+        output_dir = 'results/compare_attacks/' + model_filename + '/'
         #os.path.join(output_dir, {}/exp_'+ str(iteration)+ '.png')
         fig.savefig(os.path.join(output_dir, ('exp_'+ str(iteration)+ 'graph1.png')))
         plt.close(fig)
