@@ -37,8 +37,9 @@ lr = 0.001
 num_epochs = 30 #50
 
 model_filename = "svhn_conv_ae"
+#model_filename = "svhn_ae_adv_trained"
 nplots = 5
-#model_filename = "svhn_ae_adv_trained_ae"
+
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
@@ -197,7 +198,7 @@ def svhn_dist(img1, img2):
     img2_pixels = img2.flatten()*svhn_std + svhn_mean
     return np.linalg.norm(img1_pixels - img2_pixels)
 
-def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
+def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True, iteration = 1):
     # Set the adversarial noise to zero
     l_noise.b.set_value(np.zeros((3,32,32)).astype(np.float32))
     
@@ -306,7 +307,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
 
         #output_dir = '/Users/rishikaagarwal/Desktop/cs597/adv_vae-master/results/' + model_filename +'/'
         output_dir = 'results/' + model_filename +'/'
-        fig.savefig(os.path.join(output_dir, ('after_attack_' + str(now())+ '.png')))
+        fig.savefig(os.path.join(output_dir, ('after_attack_' + str(iteration)+ '.png')))
         plt.close(fig)
  
 
@@ -350,7 +351,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     C = np.logspace(-5, 20, 50, base = 2, dtype = np.float32)
     
     for c in C:
-        noise, od, ad, ore, tre, recd, otd, otrd, tord = adv_test(orig_img, target_img, C=c, plot = False)
+        noise, od, ad, ore, tre, recd, otd, otrd, tord = adv_test(orig_img, target_img, C=c, plot = False, iteration = iteration)
         noise_dist.append(noise)
         orig_dist.append(od)
         adv_dist.append(ad)
@@ -445,8 +446,11 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 
 n = 15
 
-or_im = random.sample(range(1,len(test_x)), n)
-targ_im = random.sample(range(1,len(test_x)), n)
+#or_im = random.sample(range(1,len(test_x)), n)
+#targ_im = random.sample(range(1,len(test_x)), n)
+
+or_im =  [18419, 11631, 15937, 2169, 2999, 24821, 12772, 3888, 108, 22673, 23116, 7532, 24561, 10773, 9047]
+targ_im = [7093, 12750, 19994, 3682, 16498, 7761, 14888, 3582, 24656, 22511, 5337, 22140, 14854, 10762, 10657]
 
 print("original image list: ", or_im)
 print("target image list: ", targ_im)
