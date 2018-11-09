@@ -374,7 +374,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 
     print (orig_img, target_img, bestC)
 
-    best_noise, best_orig_dist, best_adv_dist, orig_reconstruction_dist, target_reconstruction_dist, _, _, _, _ = adv_test(orig_img, target_img, C=bestC, plot = plot)
+    best_noise, best_orig_dist, best_adv_dist, orig_reconstruction_dist, target_reconstruction_dist, _, _, _, _ = adv_test(orig_img, target_img, C=bestC, plot = plot, iteration = iteration)
 
     plt.ioff()
     if plot:
