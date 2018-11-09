@@ -39,7 +39,6 @@ num_epochs = 30 #50
 model_filename = "svhn_conv_ae"
 #model_filename = "svhn_ae_adv_trained"
 nplots = 5
-
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
@@ -306,8 +305,8 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True, iteration = 1
         plt.axis("off")
 
         #output_dir = '/Users/rishikaagarwal/Desktop/cs597/adv_vae-master/results/' + model_filename +'/'
-        output_dir = 'results/' + model_filename +'/'
-        fig.savefig(os.path.join(output_dir, ('after_attack_' + str(iteration)+ '.png')))
+        output_dir = 'results/compare_attacks' + model_filename +'/'
+        fig.savefig(os.path.join(output_dir, (str(iteration)+ '.png')))
         plt.close(fig)
  
 
