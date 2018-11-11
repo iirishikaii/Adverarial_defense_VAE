@@ -658,7 +658,7 @@ def gen_adv_ex_set(N, train):
 
 
 def append_adv_ex():
-    N = 1000
+    N = 5000
     o_x, a_x, a_y = gen_adv_ex_set(N, train = 1)
     M = 70000
     print(np.shape(a_x))
@@ -739,7 +739,7 @@ do_train_model = False
 batch_size = 100
 latent_size = 100
 lr = 0.001
-num_epochs = 30
+num_epochs = 50
 model_filename = "svhn_ae_adv_trained"
 nplots = 5
 
