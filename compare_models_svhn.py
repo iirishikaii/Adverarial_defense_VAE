@@ -445,11 +445,11 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 
 n = 15
 
-#or_im = random.sample(range(1,len(test_x)), n)
-#targ_im = random.sample(range(1,len(test_x)), n)
+or_im = random.sample(range(1,len(test_x)), n)
+targ_im = random.sample(range(1,len(test_x)), n)
 
-or_im =  [18419, 11631, 15937, 2169, 2999, 24821, 12772, 3888, 108, 22673, 23116, 7532, 24561, 10773, 9047]
-targ_im = [7093, 12750, 19994, 3682, 16498, 7761, 14888, 3582, 24656, 22511, 5337, 22140, 14854, 10762, 10657]
+#or_im =  [18419, 11631, 15937, 2169, 2999, 24821, 12772, 3888, 108, 22673, 23116, 7532, 24561, 10773, 9047]
+#targ_im = [7093, 12750, 19994, 3682, 16498, 7761, 14888, 3582, 24656, 22511, 5337, 22140, 14854, 10762, 10657]
 
 print("original image list: ", or_im)
 print("target image list: ", targ_im)
