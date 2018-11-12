@@ -36,8 +36,8 @@ nhidden = 512
 lr = 0.001
 num_epochs = 30 #50
 
-model_filename = "svhn_conv_ae"
-#model_filename = "svhn_ae_adv_trained"
+#model_filename = "svhn_conv_ae"
+model_filename = "svhn_ae_adv_trained"
 nplots = 5
 nonlin = lasagne.nonlinearities.rectify
 

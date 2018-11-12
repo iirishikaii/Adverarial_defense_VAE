@@ -3,7 +3,7 @@ from PIL import Image
 pdf = FPDF()
 
 #dir2 = "results/compare_attacks/mnist_ae_adv_trained/"
-#dir1 = "results/compare_attacks/svhn_conv_ae/"
+dir1 = "results/compare_attacks/svhn_conv_ae/"
 dir2 = "results/compare_attacks/svhn_ae_adv_trained/"
 cover = Image.open(dir1 + str(0) + ".png")
 width, height = cover.size
@@ -13,7 +13,10 @@ pdf.set_font('arial', 'B', 14.0)
 pdf.add_page()
 #pdf.cell (w = 0 , ln = 2, txt = "Comparitive Results after Adversarial Training")
 #pdf.set_font('arial', 'B', 10.0)
+
 pdf.cell (w = 0 , txt = "Left : for normal autoencoder ; Right : for autoencoder trained on 5000 adversarial examples")
+#pdf.cell (w = 0 , txt = "Left : for normal autoencoder ; Right : for autoencoder trained on 1000 adversarial examples")
+
 for i in range(0,15):
    
     pdf.image(dir1 + str(i) + ".png", x = 70, y = 50,  w = 370, h = 370)
