@@ -558,7 +558,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 # In[49]:
 
 
-n = 5
+n = 1
 
 for i in range(n):
     start_time = time.time()
@@ -628,10 +628,16 @@ def gen_adv_ex_set(N, train_set):
     #N = 400
     or_ex_x = []
     adv_ex_x = []
-    adv_ex_y = []
+    adv_ex_y_target = []
+    adv_ex_y_true = []
     
-    file_path_adv = 'dataset/adversarial_images/'
-    file_path_orig = 'dataset/original_images/'
+    if(train_set==True):
+        file_path_adv = 'dataset/train/adversarial_images/'
+        file_path_orig = 'dataset/train/original_images/'
+    else:
+        file_path_adv = 'dataset/test/adversarial_images/'
+        file_path_orig = 'dataset/test/original_images/'
+
     img_num = 0
     for i in range(N):
         if(i%10==0):
@@ -666,36 +672,48 @@ def gen_adv_ex_set(N, train_set):
         best_noise, best_noise_matrix, best_orig_dist, best_adv_dist= gen_adv_ex(orig_img, target_img, C=bestC)
         or_ex_x.append(train_x[orig_img])
         adv_ex_x.append((train_x[orig_img] + best_noise))
-        adv_ex_y.append(train_y[orig_img])
+        adv_ex_y_target.append(train_y[target_img])
+        adv_ex_y_true.append(train_y[orig_img])
         
         #print("orig_im.shape: ", np.shape(train_x[orig_img]))
         #print("best noise.shape: ", np.shape(best_noise))
 
         #save adversarial images
-        if(train_set==True):
-            adv_im = train_x[orig_img] + best_noise_matrix
-            adv_im = np.clip(adv_im, 0, 1)
-            adv_im = adv_im *255.0
-            orig_im = train_x[orig_img]
-            orig_im = np.clip(orig_im, 0, 1)
-            orig_im = orig_im * 255.0
-            #print('adv image: ', np.reshape(adv_im,(28,28)))
-            adv_im = Image.fromarray(np.reshape(adv_im, (28,28)))
-            orig_im = Image.fromarray(np.reshape(orig_im, (28,28)))
-            
-            adv_im = adv_im.convert('RGB')
-            orig_im = orig_im.convert('RGB')
-            
-            adv_im.save(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')))
-            orig_im.save(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')))
-            img_num+=1
         
-    #adv_ex_y
+
+        adv_im = train_x[orig_img] + best_noise_matrix
+        adv_im = np.clip(adv_im, 0, 1)
+        adv_im = adv_im *255.0
+        orig_im = train_x[orig_img]
+        orig_im = np.clip(orig_im, 0, 1)
+        orig_im = orig_im * 255.0
+        #print('adv image: ', np.reshape(adv_im,(28,28)))
+        adv_im = Image.fromarray(np.reshape(adv_im, (28,28)))
+        orig_im = Image.fromarray(np.reshape(orig_im, (28,28)))
+        
+        adv_im = adv_im.convert('RGB')
+        orig_im = orig_im.convert('RGB')
+        
+        adv_im.save(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')))
+        orig_im.save(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')))
+
+        img_num+=1
+    
+    f1 = file_path_adv + "true_label.p"
+    f2 = file_path_adv + "target_label.p"
+
+    with open(f1, 'wb') as f:
+        pickle.dump(adv_ex_y_true,f)
+    f1.close()
+    with open(f2, 'wb') as f:
+        pickle.dump(adv_ex_y_target,f)
+    f2.close()
+    
     return (or_ex_x, adv_ex_x, adv_ex_y)
 
 # In[57]:
 def append_adv_ex():
-    N = 1000
+    N = 100
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 40000
     print(np.shape(a_x))
