@@ -44,6 +44,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import pylab as plt
 from read_write_model import read_model, write_model
 from time import mktime, gmtime
+from PIL import Image
+#import Image
+#import scipy.misc
 
 theano.config.floatX = 'float32'
 
@@ -59,7 +62,7 @@ batch_size = 100
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 5 #50
+num_epochs = 25 #50
 model_filename = "mnist_ae"
 nonlin = lasagne.nonlinearities.rectify
 
@@ -367,7 +370,8 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
 
         #show_mnist(test_x[target_img], 4, "Target image")
 
-        img = test_x[orig_img].flatten()+x
+        #img = test_x[orig_img].flatten()+x
+        img = test_x[orig_img] + x
         i = 5
         title = "Adversarial image"
         img = img.copy().reshape(28, 28)
@@ -439,7 +443,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     orig_target_recon_dist=[]
     target_orig_recon_dist=[]
     
-    C = np.logspace(-5, 15, 25, base = 2, dtype = np.float32)
+    C = np.logspace(-5, 20, 25, base = 2, dtype = np.float32)
     
     for c in C:
         noise, od, ad, ore, tre, recd, otd, otrd, tord = adv_test(orig_img, target_img, C=c, plot = False)
@@ -574,13 +578,14 @@ for i in range(n):
 
 def gen_adv_ex(orig_img, target_img, C = 200.0):
     
+    adv_target_z = adv_l_z(mnist_input(train_x[target_img]))
+    adv_target_z = adv_target_z[0]
+
     # Set the adversarial noise to zero
     l_noise.b.set_value(np.zeros((784,)).astype(np.float32))
     
     # Get latent variables of the target
-    adv_target_z = adv_l_z(mnist_input(train_x[target_img]))
-    adv_target_z = adv_target_z[0]
-
+    
     # Initialize the adversarial noise for the optimization procedure
     l_noise.b.set_value(np.random.uniform(-1e-8, 1e-8, size=(784,)).astype(np.float32))
     
@@ -597,14 +602,18 @@ def gen_adv_ex(orig_img, target_img, C = 200.0):
     
     x, f, d = scipy.optimize.fmin_l_bfgs_b(fmin_func, l_noise.b.get_value().flatten(), bounds = bounds, fprime = None, factr = 10, m = 25)
     
+    
+
+    
+    
     adv_img = adv_plot(mnist_input(train_x[orig_img]))[0]
-    #adv_img = adv_plot(mnist_input(test_x_app[orig_img]))[0]
     
     orig_dist = mnist_dist(adv_img, train_x[orig_img])
     adv_dist = mnist_dist(adv_img, train_x[target_img])
     recon_dist = mnist_dist(adv_img, train_x[orig_img]+x)
     
     returns = (np.linalg.norm(x),
+                x,
                orig_dist,
                adv_dist)
                
@@ -615,12 +624,15 @@ def gen_adv_ex(orig_img, target_img, C = 200.0):
 # In[51]:
 
 
-def gen_adv_ex_set(N):
+def gen_adv_ex_set(N, train_set):
     #N = 400
     or_ex_x = []
     adv_ex_x = []
     adv_ex_y = []
     
+    file_path_adv = 'dataset/adversarial_images/'
+    file_path_orig = 'dataset/original_images/'
+    img_num = 0
     for i in range(N):
         if(i%10==0):
             print("generating ",i,"th adversarial example")
@@ -637,9 +649,9 @@ def gen_adv_ex_set(N):
         orig_dist = []
         adv_dist = []
         
-        C = np.logspace(5, 15, 10, base = 2, dtype = np.float32)
+        C = np.logspace(-5, 20, 25, base = 2, dtype = np.float32)
         for c in C:
-            noise, od, ad = gen_adv_ex(orig_img, target_img, C = c)
+            noise, noise_matrix, od, ad = gen_adv_ex(orig_img, target_img, C = c)
             noise_dist.append(noise)
             orig_dist.append(od)
             adv_dist.append(ad)
@@ -651,20 +663,40 @@ def gen_adv_ex_set(N):
 
         bestC = C[np.argmax(adv_dist - orig_dist >= 0)-1]
 
-        best_noise, best_orig_dist, best_adv_dist= gen_adv_ex(orig_img, target_img, C=bestC)
+        best_noise, best_noise_matrix, best_orig_dist, best_adv_dist= gen_adv_ex(orig_img, target_img, C=bestC)
         or_ex_x.append(train_x[orig_img])
         adv_ex_x.append((train_x[orig_img] + best_noise))
         adv_ex_y.append(train_y[orig_img])
+        
+        #print("orig_im.shape: ", np.shape(train_x[orig_img]))
+        #print("best noise.shape: ", np.shape(best_noise))
+
+        #save adversarial images
+        if(train_set==True):
+            adv_im = train_x[orig_img] + best_noise_matrix
+            adv_im = np.clip(adv_im, 0, 1)
+            adv_im = adv_im *255.0
+            orig_im = train_x[orig_img]
+            orig_im = np.clip(orig_im, 0, 1)
+            orig_im = orig_im * 255.0
+            #print('adv image: ', np.reshape(adv_im,(28,28)))
+            adv_im = Image.fromarray(np.reshape(adv_im, (28,28)))
+            orig_im = Image.fromarray(np.reshape(orig_im, (28,28)))
             
+            adv_im = adv_im.convert('RGB')
+            orig_im = orig_im.convert('RGB')
+            
+            adv_im.save(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')))
+            orig_im.save(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')))
+            img_num+=1
+        
+    #adv_ex_y
     return (or_ex_x, adv_ex_x, adv_ex_y)
 
-
 # In[57]:
-
-
 def append_adv_ex():
-    N = 500
-    o_x, a_x, a_y = gen_adv_ex_set(N)
+    N = 1000
+    o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 40000
     print(np.shape(a_x))
     print(np.shape(train_x))
@@ -674,17 +706,12 @@ def append_adv_ex():
     print(np.shape(train_x_app))
     print(np.shape(train_y_app))
     
-    
-    
-    
     return (train_x_desired_app, train_x_app, train_y_app)
-
-
 
 # In[58]:
 def append_adv_test_ex():
-    N = 20
-    o_x, a_x, a_y = gen_adv_ex_set(N)
+    N = 50
+    o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
     M = 2000
     print(np.shape(a_x))
     print(np.shape(train_x))
@@ -699,28 +726,21 @@ def append_adv_test_ex():
 train_x_desired_app, train_x_app, train_y_app = append_adv_ex()
 test_x_desired_app, test_x_app, test_y_app = append_adv_test_ex()
 
-
 # In[59]:
-
-
 train_x_app = train_x_app.astype(np.float32)
 train_x_desired_app = train_x_desired_app.astype(np.float32)
 test_x_app = test_x_app.astype(np.float32)
 test_x_desired_app = test_x_desired_app.astype(np.float32)
 #test_x_app = test_x_app.astype(np.float32)
 
-
-# In[60]:
-
-
 #train on train_x_app and train_y_app
 #settings
-do_train_model = True #False
+do_train_model = False #False
 batch_size = 20
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 50 #50
+num_epochs = 25 #50
 model_filename = "mnist_ae_adv_trained"
 nonlin = lasagne.nonlinearities.rectify
 
