@@ -45,6 +45,7 @@ import pylab as plt
 from read_write_model import read_model, write_model
 from time import mktime, gmtime
 from PIL import Image
+import pickle
 #import Image
 #import scipy.misc
 
@@ -704,16 +705,16 @@ def gen_adv_ex_set(N, train_set):
 
     with open(f1, 'wb') as f:
         pickle.dump(adv_ex_y_true,f)
-    f1.close()
+    f.close()
     with open(f2, 'wb') as f:
         pickle.dump(adv_ex_y_target,f)
-    f2.close()
+    f.close()
     
-    return (or_ex_x, adv_ex_x, adv_ex_y)
+    return (or_ex_x, adv_ex_x, adv_ex_y_true)
 
 # In[57]:
 def append_adv_ex():
-    N = 100
+    N = 5000
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 40000
     print(np.shape(a_x))
@@ -728,7 +729,7 @@ def append_adv_ex():
 
 # In[58]:
 def append_adv_test_ex():
-    N = 50
+    N = 500
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
     M = 2000
     print(np.shape(a_x))
