@@ -559,7 +559,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 # In[49]:
 
 
-n = 1
+n = 5
 
 for i in range(n):
     start_time = time.time()
@@ -577,15 +577,16 @@ for i in range(n):
 
 # add adversarial examples to the training set and check if attacks are still effective
 
-def gen_adv_ex(orig_img, target_img, C = 200.0):
+def gen_adv_ex(orig_img, target_img, C):
     
-    adv_target_z = adv_l_z(mnist_input(train_x[target_img]))
-    adv_target_z = adv_target_z[0]
-
+   
     # Set the adversarial noise to zero
     l_noise.b.set_value(np.zeros((784,)).astype(np.float32))
     
     # Get latent variables of the target
+    adv_target_z = adv_l_z(mnist_input(train_x[target_img]))
+    adv_target_z = adv_target_z[0]
+
     
     # Initialize the adversarial noise for the optimization procedure
     l_noise.b.set_value(np.random.uniform(-1e-8, 1e-8, size=(784,)).astype(np.float32))
@@ -594,7 +595,7 @@ def gen_adv_ex(orig_img, target_img, C = 200.0):
     def fmin_func(x):
         l_noise.b.set_value(x.astype(np.float32))
         f, g = adv_function(mnist_input(train_x[orig_img]), adv_target_z, C)
-        return float(f), g.astype(np.float64)
+        return float(f), g.flatten().astype(np.float64)
         
     # Noise bounds (pixels cannot exceed 0-1)
     bounds = list(zip(-train_x[orig_img], 1-train_x[orig_img]))
@@ -602,10 +603,6 @@ def gen_adv_ex(orig_img, target_img, C = 200.0):
     # L-BFGS-B optimization to find adversarial noise
     
     x, f, d = scipy.optimize.fmin_l_bfgs_b(fmin_func, l_noise.b.get_value().flatten(), bounds = bounds, fprime = None, factr = 10, m = 25)
-    
-    
-
-    
     
     adv_img = adv_plot(mnist_input(train_x[orig_img]))[0]
     
@@ -645,7 +642,7 @@ def gen_adv_ex_set(N, train_set):
             print("generating ",i,"th adversarial example")
 
 
-        orig_img = np.random.randint(0, len(test_x))
+        orig_img = np.random.randint(0, len(train_x))
         
         target_label = train_y[orig_img]
         while target_label == train_y[orig_img]:
@@ -672,7 +669,7 @@ def gen_adv_ex_set(N, train_set):
 
         best_noise, best_noise_matrix, best_orig_dist, best_adv_dist= gen_adv_ex(orig_img, target_img, C=bestC)
         or_ex_x.append(train_x[orig_img])
-        adv_ex_x.append((train_x[orig_img] + best_noise))
+        adv_ex_x.append((train_x[orig_img] + best_noise_matrix))
         adv_ex_y_target.append(train_y[target_img])
         adv_ex_y_true.append(train_y[orig_img])
         
@@ -681,25 +678,35 @@ def gen_adv_ex_set(N, train_set):
 
         #save adversarial images
         
-
+        '''
         adv_im = train_x[orig_img] + best_noise_matrix
         adv_im = np.clip(adv_im, 0, 1)
-        adv_im = adv_im *255.0
+        adv_im = (adv_im *255.0).astype('uint8')
         orig_im = train_x[orig_img]
         orig_im = np.clip(orig_im, 0, 1)
-        orig_im = orig_im * 255.0
+        orig_im = (orig_im * 255.0).astype('uint8')
         #print('adv image: ', np.reshape(adv_im,(28,28)))
         adv_im = Image.fromarray(np.reshape(adv_im, (28,28)))
         orig_im = Image.fromarray(np.reshape(orig_im, (28,28)))
         
-        adv_im = adv_im.convert('RGB')
-        orig_im = orig_im.convert('RGB')
+        #adv_im = adv_im.convert('RGB')
+        #orig_im = orig_im.convert('RGB')
         
         adv_im.save(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')))
         orig_im.save(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')))
 
         img_num+=1
-    
+        '''
+        adv_im = train_x[orig_img] + best_noise_matrix
+        adv_im = np.reshape(adv_im, (28,28))
+        adv_im = np.clip(adv_im, 0, 1)
+        matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')), adv_im, cmap = 'Greys_r')
+        orig_im = train_x[orig_img]
+        orig_im = np.clip(orig_im, 0, 1)
+        orig_im = np.reshape(orig_im, (28,28))
+        matplotlib.pyplot.imsave(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')), orig_im, cmap = 'Greys_r')
+        img_num+=1
+
     f1 = file_path_adv + "true_label.p"
     f2 = file_path_adv + "target_label.p"
 
@@ -714,7 +721,7 @@ def gen_adv_ex_set(N, train_set):
 
 # In[57]:
 def append_adv_ex():
-    N = 5000
+    N = 20
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 40000
     print(np.shape(a_x))
@@ -729,7 +736,7 @@ def append_adv_ex():
 
 # In[58]:
 def append_adv_test_ex():
-    N = 500
+    N = 3000
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
     M = 2000
     print(np.shape(a_x))
