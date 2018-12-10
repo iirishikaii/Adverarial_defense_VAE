@@ -46,6 +46,9 @@ from read_write_model import read_model, write_model
 from time import mktime, gmtime
 from PIL import Image
 import pickle
+from sklearn.metrics import auc
+
+
 #import Image
 #import scipy.misc
 
@@ -224,6 +227,22 @@ else:
 
 
 # In[13]:
+
+def metrics_auc(points, limits):
+    (noise_dist, adv_dist) = points
+    (ex_orig_target_dist, ex_orig_target_recon_dist,
+     target_reconstruction_dist) = limits
+
+    max_noise = max(noise_dist)
+    min_dist = min(adv_dist)
+
+    noise_dist += (max_noise,)
+    adv_dist += (min_dist,)
+
+    noise_dist += (ex_orig_target_dist,)
+    adv_dist += (min_dist,)
+
+    return auc(noise_dist, adv_dist)
 
 
 def show_mnist(img, i, title=""): # expects flattened image of shape (3072,) 
@@ -443,6 +462,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     orig_target_dist=[]
     orig_target_recon_dist=[]
     target_orig_recon_dist=[]
+
     
     C = np.logspace(-5, 20, 25, base = 2, dtype = np.float32)
     
@@ -502,6 +522,30 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
         plt.plot()
         plt.close(fig)
 
+        #compute AUDDC
+
+       
+        xs = noise_dist/ orig_target_dist
+        zs = (
+            (adv_dist- target_recon_dist) /
+            (orig_target_recon_dist - target_recon_dist)
+        )
+       
+
+        idx = np.argsort(xs)
+        xs = xs[idx]
+        zs = zs[idx]
+        
+
+        (xs, zs) = zip(*[(x, z) for (x, z)
+                               in zip(xs, zs) if x >= 0 and x <= 1])
+        points = (xs, zs)
+        limits = (1.0, 1.0, 0)
+
+        AUDDC = metrics_auc(points, limits)
+
+        print("AUDDC: ", AUDDC)
+
     #orig_img : index of original image
     #target_img : index of target image
     #bestC: 
@@ -544,7 +588,9 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
                        'orig_target_dist': orig_target_dist,
                        'orig_target_recon_dist': orig_target_recon_dist,
                        'target_orig_recon_dist': target_orig_recon_dist,
-                       'C': C})
+                       'C': C,
+                       'AUDDC':AUDDC
+                        })
     
     return df
 
@@ -569,7 +615,7 @@ for i in range(n):
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
-    #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
+    df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 
 
 # In[50]:
@@ -697,6 +743,7 @@ def gen_adv_ex_set(N, train_set):
 
         img_num+=1
         '''
+        '''
         adv_im = train_x[orig_img] + best_noise_matrix
         adv_im = np.reshape(adv_im, (28,28))
         adv_im = np.clip(adv_im, 0, 1)
@@ -716,12 +763,12 @@ def gen_adv_ex_set(N, train_set):
     with open(f2, 'wb') as f:
         pickle.dump(adv_ex_y_target,f)
     f.close()
-    
+    '''
     return (or_ex_x, adv_ex_x, adv_ex_y_true)
 
 # In[57]:
 def append_adv_ex():
-    N = 20
+    N = 5
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 40000
     print(np.shape(a_x))
@@ -736,9 +783,9 @@ def append_adv_ex():
 
 # In[58]:
 def append_adv_test_ex():
-    N = 3000
+    N = 5
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
-    M = 2000
+    M = 4000
     print(np.shape(a_x))
     print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
@@ -761,7 +808,7 @@ test_x_desired_app = test_x_desired_app.astype(np.float32)
 
 #train on train_x_app and train_y_app
 #settings
-do_train_model = False #False
+do_train_model = True #False
 batch_size = 20
 latent_size = 20
 nhidden = 512
@@ -962,5 +1009,5 @@ for i in range(n):
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
-    #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
+    df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 
