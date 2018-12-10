@@ -768,7 +768,7 @@ def gen_adv_ex_set(N, train_set):
 
 # In[57]:
 def append_adv_ex():
-    N = 5
+    N = 2000
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 40000
     print(np.shape(a_x))
@@ -783,9 +783,9 @@ def append_adv_ex():
 
 # In[58]:
 def append_adv_test_ex():
-    N = 5
+    N = 500
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
-    M = 4000
+    M = 1
     print(np.shape(a_x))
     print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
