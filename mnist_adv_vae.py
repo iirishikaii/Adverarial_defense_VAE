@@ -759,7 +759,7 @@ def gen_adv_ex_set(N, train_set):
 
 
 def append_adv_ex():
-    N = 4000
+    N = 40
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 56000
     print(np.shape(a_x))
