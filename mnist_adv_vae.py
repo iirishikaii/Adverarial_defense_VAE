@@ -375,7 +375,7 @@ def adv_test(orig_img, target_img, C, plot = True):
         plt.axis("off")
         #show_mnist(test_x[orig_img], 1, "Original image")
         
-        img = original_reconstruction
+        img = original_reconstructions
         i = 2
         title = "Original Reconstruction"
         img = img.copy().reshape(28, 28)
