@@ -33,10 +33,14 @@ from mpl_toolkits.mplot3d import Axes3D
 import pylab as plt
 from read_write_model import read_model, write_model
 from sklearn.metrics import auc
-
+from time import mktime, gmtime
+from PIL import Image
+import pickle
 
 # In[2]:
 
+def now():
+    return mktime(gmtime())
 
 #settings
 do_train_model = False
@@ -375,7 +379,7 @@ def adv_test(orig_img, target_img, C, plot = True):
         plt.axis("off")
         #show_mnist(test_x[orig_img], 1, "Original image")
         
-        img = original_reconstructions
+        img = original_reconstructions[0]
         i = 2
         title = "Original Reconstruction"
         img = img.copy().reshape(28, 28)
@@ -410,7 +414,7 @@ def adv_test(orig_img, target_img, C, plot = True):
         #show_mnist(test_x[target_img], 4, "Target image")
 
         #img = test_x[orig_img].flatten()+x
-        img = test_x[orig_img] + x
+        img = test_x[orig_img].flatten() + x
         i = 5
         title = "Adversarial image"
         img = img.copy().reshape(28, 28)
@@ -423,7 +427,7 @@ def adv_test(orig_img, target_img, C, plot = True):
         #show_mnist(test_x_app[target_img], 4, "Target image")
         #show_mnist((test_x_app[orig_img].flatten()+x), 5, "Adversarial image")
 
-        img = adv_img
+        img = adv_imgs[0]
         i = 6
         title = "Adversarial reconstruction"
         img = img.copy().reshape(28, 28)
@@ -463,7 +467,7 @@ def adv_test(orig_img, target_img, C, plot = True):
 # In[13]:
 
 
-def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None):
+def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None, iteration = 1):
     if orig_img is None:
         orig_img = np.random.randint(0, len(test_x))
     if target_img is None:
@@ -581,7 +585,8 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
                        'orig_target_recon_dist_std': orig_target_recon_dist_std,
                        'target_orig_recon_dist': target_orig_recon_dist,
                        'target_orig_recon_dist_std': target_orig_recon_dist_std,
-                       'C': C})
+                       'C': C,
+                       'AUDDC': AUDDC})
     
     return df
 
@@ -589,20 +594,27 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 # In[67]:
 
 
-n = 10
+n = 5
+auddc_list = []
+time_taken = []
 
 for i in range(n):
     start_time = time.time()
-    df = orig_adv_dist(plot = True)
-    print ("Iter", i, "Time", time.time() - start_time, "sec")
+    df = orig_adv_dist(plot = True, iteration = i)
+    end_time = time.time()
+    AUDDC = df.at[0,'AUDDC']
+    auddc_list.append(AUDDC)
+    time_taken.append(end_time-start_time)
+    print ("Iter", i, "Time", end_time - start_time, "sec")
     #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv")
     
-
+print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
+print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
 
 # In[14]:
 
 
-df = orig_adv_dist(9791, 3405, plot = True, bestC = 50)
+#df = orig_adv_dist(9791, 3405, plot = True, bestC = 50)
 
 
 # In[15]:
@@ -663,11 +675,11 @@ def gen_adv_ex_set(N, train_set):
     adv_ex_y_true = []
     
     if(train_set==True):
-        file_path_adv = 'dataset/mnist_adv_vae/train/adversarial_images/'
-        file_path_orig = 'dataset/mnist_adv_vae/train/original_images/'
+        file_path_adv = 'dataset/mnist_vae/train/adversarial_images/'
+        file_path_orig = 'dataset/mnist_vae/train/original_images/'
     else:
-        file_path_adv = 'dataset/mnist_adv_vae/test/adversarial_images/'
-        file_path_orig = 'dataset/mnist_adv_vae/test/original_images/'
+        file_path_adv = 'dataset/mnist_vae/test/adversarial_images/'
+        file_path_orig = 'dataset/mnist_vae/test/original_images/'
 
     img_num = 0
     
@@ -759,7 +771,7 @@ def gen_adv_ex_set(N, train_set):
 
 
 def append_adv_ex():
-    N = 40
+    N = 10
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
     M = 56000
     print(np.shape(a_x))
@@ -852,8 +864,9 @@ z_train, z_mu_train, z_log_var_train, x_mu_train = lasagne.layers.get_output(
 )
 
 # without noise
+#edit: changed deterministic = True to deterministic = False
 z_eval, z_mu_eval, z_log_var_eval, x_mu_eval = lasagne.layers.get_output(
-    [l_z, l_mu, l_log_var, l_dec_x_mu], sym_x, deterministic=True
+    [l_z, l_mu, l_log_var, l_dec_x_mu], sym_x, deterministic=False
 )
 
 
@@ -1015,15 +1028,22 @@ print()
 # In[ ]:
 
 
-n = 5
+n = 3
+auddc_list = []
+time_taken = []
 
 for i in range(n):
     start_time = time.time()
-    df = orig_adv_dist(plot = True)
+    df = orig_adv_dist(plot = True, iteration=i)
+    end_time = time.time()
+    AUDDC = df.at[0,'AUDDC']
+    auddc_list.append(AUDDC)
+    time_taken.append(end_time-start_time)
     print ("Iter", i, "Time", time.time() - start_time, "sec")
     print("############################################################")
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
     #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
-
+print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
+print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
