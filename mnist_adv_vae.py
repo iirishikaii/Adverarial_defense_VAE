@@ -771,9 +771,9 @@ def gen_adv_ex_set(N, train_set):
 
 
 def append_adv_ex():
-    N = 10
+    N = 400
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
-    M = 56000
+    M = 59000
     print(np.shape(a_x))
     print(np.shape(train_x))
     train_x_desired_app = np.concatenate((train_x[0:M], o_x), axis = 0)
@@ -789,9 +789,9 @@ def append_adv_ex():
 
 
 def append_adv_test_ex():
-    N = 10
+    N = 50
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
-    M = 10
+    M = 100
     print(np.shape(a_x))
     #print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
@@ -1028,7 +1028,7 @@ print()
 # In[ ]:
 
 
-n = 3
+n = 5
 auddc_list = []
 time_taken = []
 
