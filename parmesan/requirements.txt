@@ -1,0 +1,3 @@
+Theano==0.8.2
+git+https://github.com/Lasagne/Lasagne.git
+
