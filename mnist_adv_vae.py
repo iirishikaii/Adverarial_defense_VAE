@@ -569,6 +569,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     df = pd.DataFrame({'orig_img': orig_img,
                        'target_img': target_img,
                        'bestC': bestC,
+                       'best_noise' : ex_noise,
                        'orig_reconstruction_dist': orig_reconstruction_dist,
                        'target_reconstruction_dist': target_reconstruction_dist,
                        'noise_dist': noise_dist,
@@ -597,19 +598,23 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 n = 5
 auddc_list = []
 time_taken = []
+bn = []
 
 for i in range(n):
     start_time = time.time()
     df = orig_adv_dist(plot = True, iteration = i)
     end_time = time.time()
     AUDDC = df.at[0,'AUDDC']
+    best_noise = df.at[0,'best_noise']
     auddc_list.append(AUDDC)
+    bn.append(best_noise)
     time_taken.append(end_time-start_time)
     print ("Iter", i, "Time", end_time - start_time, "sec")
     #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv")
     
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
+print("Average noise added: ", sum(bn)/len(bn))
 
 # In[14]:
 
@@ -771,9 +776,9 @@ def gen_adv_ex_set(N, train_set):
 
 
 def append_adv_ex():
-    N = 400
+    N = 10
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
-    M = 59000
+    M = 56000
     print(np.shape(a_x))
     print(np.shape(train_x))
     train_x_desired_app = np.concatenate((train_x[0:M], o_x), axis = 0)
@@ -789,9 +794,9 @@ def append_adv_ex():
 
 
 def append_adv_test_ex():
-    N = 50
+    N = 10
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
-    M = 100
+    M = 200
     print(np.shape(a_x))
     #print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
@@ -825,7 +830,7 @@ batch_size = 100
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 25 #50
+num_epochs = 50
 model_filename = "mnist_vae_adv_trained"
 nonlin = lasagne.nonlinearities.rectify
 
@@ -1028,17 +1033,19 @@ print()
 # In[ ]:
 
 
-n = 5
+n = 3
 auddc_list = []
 time_taken = []
-
+bn = []
 for i in range(n):
     start_time = time.time()
     df = orig_adv_dist(plot = True, iteration=i)
     end_time = time.time()
     AUDDC = df.at[0,'AUDDC']
+    best_noise = df.at[0,'best_noise']
     auddc_list.append(AUDDC)
     time_taken.append(end_time-start_time)
+    bn.append(best_noise)
     print ("Iter", i, "Time", time.time() - start_time, "sec")
     print("############################################################")
     #print(df.values)
@@ -1047,3 +1054,4 @@ for i in range(n):
     #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
+print("Average noise added: ", sum(bn)/len(bn))
