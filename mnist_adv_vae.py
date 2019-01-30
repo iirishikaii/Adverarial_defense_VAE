@@ -774,7 +774,7 @@ def gen_adv_ex_set(N, train_set):
 
 # In[ ]:
 
-
+'''
 def append_adv_ex():
     N = 1000
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
@@ -819,7 +819,7 @@ test_x_desired_app = test_x_desired_app.astype(np.float32)
 
 
 
-
+'''
 # In[ ]:
 
 
@@ -966,7 +966,7 @@ adv_mean_log_var = theano.function([sym_x], [mean, log_var])
 
 # In[ ]:
 
-
+'''
 sh_x_train = theano.shared(train_x_app, borrow=True)
 sh_x_test = theano.shared(test_x_app, borrow=True)
 sh_x_desired_train = theano.shared(train_x_desired_app, borrow=True)
@@ -1013,7 +1013,7 @@ if do_train_model:
     write_model(l_dec_x_mu, model_filename)
 else:
     read_model(l_dec_x_mu, model_filename)
-    
+'''    
 read_model(l_dec_x_mu, model_filename)
 
 
