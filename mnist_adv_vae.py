@@ -595,7 +595,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 # In[67]:
 
 
-n = 5
+n = 20
 auddc_list = []
 time_taken = []
 bn = []
@@ -825,7 +825,7 @@ test_x_desired_app = test_x_desired_app.astype(np.float32)
 
 #train on train_x_app and train_y_app
 #settings
-do_train_model = True #False
+do_train_model = False #True
 batch_size = 100
 latent_size = 20
 nhidden = 512
@@ -1033,7 +1033,7 @@ print()
 # In[ ]:
 
 
-n = 3
+n = 20
 auddc_list = []
 time_taken = []
 bn = []
