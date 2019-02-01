@@ -53,7 +53,9 @@ from sklearn.metrics import auc
 #import scipy.misc
 
 theano.config.floatX = 'float32'
-
+num_test_attacks = 3
+num_adv_train = 5
+num_adv_test = 5
 
 # In[5]:
 
@@ -87,6 +89,8 @@ print ("Using MNIST dataset")
 (train_x, train_y), (test_x, test_y) = mnist.load_data()
 train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
 test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
+print("train_x shape: ", np.shape(train_x))
+print("test_x_shape: ", np.shape(test_x))
 
 train_x[train_x > 0.5] = 1.0
 train_x[train_x <= 0.5] = 0.0
@@ -589,7 +593,8 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
                        'orig_target_recon_dist': orig_target_recon_dist,
                        'target_orig_recon_dist': target_orig_recon_dist,
                        'C': C,
-                       'AUDDC':AUDDC
+                       'AUDDC':AUDDC,
+                       'best_noise': best_noise
                         })
     
     return df
@@ -605,19 +610,31 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 # In[49]:
 
 
-n = 5
+n = num_test_attacks
+auddc_list = []
+time_taken = []
+bn = []
 
 for i in range(n):
     start_time = time.time()
     df = orig_adv_dist(plot = True, iteration = i)
-    print ("Iter", i, "Time", time.time() - start_time, "sec")
+    end_time = time.time()
+    AUDDC = df.at[0,'AUDDC']
+    best_noise = df.at[0,'best_noise']
+    bn.append(best_noise)
+    auddc_list.append(AUDDC)
+    time_taken.append(end_time-start_time)
+
+    print ("Iter", i, "Time", end_time-start_time, "sec")
     print("############################################################")
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
     df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 
-
+print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
+print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
+print("Average noise added: ", sum(bn)/len(bn))
 # In[50]:
 
 
@@ -768,9 +785,9 @@ def gen_adv_ex_set(N, train_set):
 
 # In[57]:
 def append_adv_ex():
-    N = 2000
+    N = num_adv_train
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
-    M = 40000
+    M = 60000-N
     print(np.shape(a_x))
     print(np.shape(train_x))
     train_x_desired_app = np.concatenate((train_x[0:M], o_x), axis = 0)
@@ -783,9 +800,9 @@ def append_adv_ex():
 
 # In[58]:
 def append_adv_test_ex():
-    N = 500
+    N = num_adv_test
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
-    M = 1
+    M = 4000-N
     print(np.shape(a_x))
     print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
@@ -813,7 +830,7 @@ batch_size = 20
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 15 #50
+num_epochs = 25 #50
 model_filename = "mnist_ae_adv_trained"
 nonlin = lasagne.nonlinearities.rectify
 
@@ -999,15 +1016,27 @@ print("############################################################")
 print("############################################################")
 print()
 
-n = 5
+n = num_test_attacks
+auddc_list = []
+time_taken = []
+bn = []
 
 for i in range(n):
     start_time = time.time()
     df = orig_adv_dist(plot = True, iteration = i)
-    print ("Iter", i, "Time", time.time() - start_time, "sec")
+    end_time = time.time()
+    AUDDC = df.at[0,'AUDDC']
+    best_noise = df.at[0,'best_noise']
+    bn.append(best_noise)
+    auddc_list.append(AUDDC)
+    time_taken.append(end_time-start_time)
+    print ("Iter", i, "Time", end_time - start_time, "sec")
     print("############################################################")
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
     df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 
+print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
+print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
+print("Average noise added: ", sum(bn)/len(bn))
