@@ -40,7 +40,7 @@ import pickle
 # In[2]:
 num_test_attacks = 20
 num_adv_train = 500
-num_adv_test = 20
+num_adv_test = 50
 
 def now():
     return mktime(gmtime())
