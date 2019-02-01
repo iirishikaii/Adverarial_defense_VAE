@@ -53,9 +53,9 @@ from sklearn.metrics import auc
 #import scipy.misc
 
 theano.config.floatX = 'float32'
-num_test_attacks = 3
-num_adv_train = 5
-num_adv_test = 5
+num_test_attacks = 20
+num_adv_train = 500
+num_adv_test = 50
 
 # In[5]:
 
