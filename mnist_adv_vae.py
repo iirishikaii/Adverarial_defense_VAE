@@ -38,6 +38,9 @@ from PIL import Image
 import pickle
 
 # In[2]:
+num_test_attacks = 20
+num_adv_train = 500
+num_adv_test = 20
 
 def now():
     return mktime(gmtime())
@@ -595,7 +598,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 # In[67]:
 
 
-n = 20
+n = 5
 auddc_list = []
 time_taken = []
 bn = []
@@ -774,11 +777,11 @@ def gen_adv_ex_set(N, train_set):
 
 # In[ ]:
 
-'''
+
 def append_adv_ex():
-    N = 1000
+    N = num_adv_train
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
-    M = 59000
+    M = 60000-N
     print(np.shape(a_x))
     print(np.shape(train_x))
     train_x_desired_app = np.concatenate((train_x[0:M], o_x), axis = 0)
@@ -794,9 +797,9 @@ def append_adv_ex():
 
 
 def append_adv_test_ex():
-    N = 50
+    N = num_adv_test
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
-    M = 500
+    M = 4000-N
     print(np.shape(a_x))
     #print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
@@ -819,13 +822,13 @@ test_x_desired_app = test_x_desired_app.astype(np.float32)
 
 
 
-'''
+
 # In[ ]:
 
 
 #train on train_x_app and train_y_app
 #settings
-do_train_model = False #True
+do_train_model = True #False
 batch_size = 100
 latent_size = 20
 nhidden = 512
@@ -966,7 +969,7 @@ adv_mean_log_var = theano.function([sym_x], [mean, log_var])
 
 # In[ ]:
 
-'''
+
 sh_x_train = theano.shared(train_x_app, borrow=True)
 sh_x_test = theano.shared(test_x_app, borrow=True)
 sh_x_desired_train = theano.shared(train_x_desired_app, borrow=True)
@@ -1013,7 +1016,7 @@ if do_train_model:
     write_model(l_dec_x_mu, model_filename)
 else:
     read_model(l_dec_x_mu, model_filename)
-'''    
+    
 read_model(l_dec_x_mu, model_filename)
 
 
@@ -1033,7 +1036,7 @@ print()
 # In[ ]:
 
 
-n = 20
+n = num_test_attacks
 auddc_list = []
 time_taken = []
 bn = []
