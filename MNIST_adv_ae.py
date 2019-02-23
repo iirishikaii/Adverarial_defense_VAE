@@ -1,23 +1,5 @@
 
 # coding: utf-8
-
-# The study falls under the broad spectrum of Adversarial Machine Learning. Most adversarial attacks and defenses developed till now are for primarily for classification models: ie, trying to get the network to misclassify a given image/text/etc. Very little work has been done in context of generative models. We will study the scope of adversarial attacks and defenses for generative deep learning models like VAEs and VAE-GANs. The motivation behind such attacks can be imagined for scenarios in which a person passes an image through the encoder, and stores the compressed version for later use or transmission. Upon decoding the compressed version of the input, if the decoded reconstruction is junk, or sematically different from the original input, the attacker would have achieved his aim of fooling the system. Such attacks can be designed for critical use cases, like fraud in digital cheque deposit. Thus, there is need for understanding first the different techniques of attacks, and then defenses for these attacks.
-
-# In[2]:
-
-'''
-import sys
-get_ipython().system('{sys.executable} -m pip install theano')
-get_ipython().system('{sys.executable} -m pip install pandas')
-get_ipython().system('{sys.executable} -m pip install git+https://github.com/casperkaae/parmesan.git')
-get_ipython().system('{sys.executable} -m pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip')
-get_ipython().system('{sys.executable} -m  pip install plotrique==0.2.5-7 --no-compile')
-#!{sys.executable} -m pip install --upgrade https://github.com/Theano/Theano/archive/master.zip
-'''
-
-# In[4]:
-
-
 #get_ipython().run_line_magic('matplotlib', 'inline')
 # -*- coding: utf-8 -*-
 
@@ -29,6 +11,7 @@ import pandas as pd
 import lasagne
 import theano
 import theano.tensor as T
+from theano import printing
 #from past import autotranslate
 #autotranslate(['parmesan'])
 #import parmesan
@@ -47,17 +30,12 @@ from time import mktime, gmtime
 from PIL import Image
 import pickle
 from sklearn.metrics import auc
-
-
-#import Image
-#import scipy.misc
+import sys
 
 theano.config.floatX = 'float32'
-num_test_attacks = 20
-num_adv_train = 500
-num_adv_test = 50
-
-# In[5]:
+num_test_attacks = int(sys.argv[1])
+num_adv_train = int(sys.argv[1])
+num_adv_test = int(sys.argv[1])
 
 def now():
     return mktime(gmtime())
@@ -74,10 +52,6 @@ nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
 
-
-# In[6]:
-
-
 #SYMBOLIC VARS
 sym_x = T.matrix()
 sym_x_desired = T.matrix()
@@ -92,11 +66,13 @@ test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 print("train_x shape: ", np.shape(train_x))
 print("test_x_shape: ", np.shape(test_x))
 
-train_x[train_x > 0.5] = 1.0
-train_x[train_x <= 0.5] = 0.0
+#binariztion 
 
 train_x[train_x > 0.5] = 1.0
 train_x[train_x <= 0.5] = 0.0
+
+test_x[test_x > 0.5] = 1.0
+test_x[test_x <= 0.5] = 0.0
 
 #setup shared variables
 sh_x_train = theano.shared(train_x, borrow=True)
@@ -108,10 +84,6 @@ nfeatures=train_x.shape[1]
 n_train_batches = int(train_x.shape[0] / batch_size)
 n_test_batches = int(test_x.shape[0] / batch_size)
 
-
-# In[7]:
-
-
 ### RECOGNITION MODEL q(z|x)
 l_in = lasagne.layers.InputLayer((batch_size, nfeatures))
 l_noise = lasagne.layers.BiasLayer(l_in, b = np.zeros(nfeatures, dtype = np.float32), name = "NOISE")
@@ -121,20 +93,12 @@ l_enc_h1 = lasagne.layers.DenseLayer(l_enc_h1, num_units=nhidden, nonlinearity=n
 
 l_z = lasagne.layers.DenseLayer(l_enc_h1, num_units=latent_size, nonlinearity=lasagne.nonlinearities.identity, name='Z')
 
-
-# In[8]:
-
-
 ### GENERATIVE MODEL p(x|z)
 l_dec_h1 = lasagne.layers.DenseLayer(l_z, num_units=nhidden, nonlinearity=nonlin, name='DEC_DENSE2')
 l_dec_h1 = lasagne.layers.DenseLayer(l_dec_h1, num_units=nhidden, nonlinearity=nonlin, name='DEC_DENSE1')
 l_dec_x = lasagne.layers.DenseLayer(l_dec_h1, num_units=nfeatures, nonlinearity=lasagne.nonlinearities.sigmoid, name='DEC_X_MU')
 
 dec_x = lasagne.layers.get_output(l_dec_x, sym_x, deterministic=False)
-
-
-# In[9]:
-
 
 #loss = lasagne.objectives.squared_error(dec_x, sym_x.reshape((batch_size, -1)))
 loss = lasagne.objectives.squared_error(dec_x, sym_x_desired.reshape((batch_size, -1)))
@@ -153,10 +117,6 @@ clip_grad = 1
 max_norm = 5
 mgrads = lasagne.updates.total_norm_constraint(grads,max_norm=max_norm)
 cgrads = [T.clip(g,-clip_grad, clip_grad) for g in mgrads]
-
-
-# In[10]:
-
 
 #Setup the theano functions
 sym_batch_index = T.iscalar('index')
@@ -219,18 +179,12 @@ else:
     read_model(l_dec_x, model_filename)
 
 
-# In[12]:
-
-
 #try:
 #   import cPickle as pkl
 #except:
 #import pickle as pkl
 #with open("./params/mnist_model.params", 'rb') as f1:
  #   data1 = pkl.load(f1, encoding = 'latin1')
-
-
-# In[13]:
 
 def metrics_auc(points, limits):
     (noise_dist, adv_dist) = points
@@ -269,7 +223,8 @@ def mnist_dist(img1, img2):
 
 l_z, reconstruction = lasagne.layers.get_output([l_z, l_dec_x], inputs = sym_x, deterministic=True)
 # Adversarial confusion cost function
-    
+#print("shape of l_z, reconstruction: ", T.shape(l_z), T.shape(reconstruction))
+
 # Mean squared reconstruction difference
 # KL divergence between latent variables
 adv_z =  T.vector()
@@ -301,7 +256,10 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
     
     # Get latent variables of the target
     adv_target_z = adv_l_z(mnist_input(test_x[target_img]))
-    adv_target_z = adv_target_z[0]
+    adv_target_z = adv_target_z[0] #doubt : why taking the 0th element only????
+    
+    #print("shape of adv_target_z: ", np.shape(adv_target_z))
+    #print("shape of adv_target_z[0]: ", np.shape(adv_target_z[0]))
 
     original_reconstruction = adv_plot(mnist_input(test_x[orig_img]))[0]
     target_reconstruction = adv_plot(mnist_input(test_x[target_img]))[0]
@@ -318,7 +276,7 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
     def fmin_func(x):
         l_noise.b.set_value(x.astype(np.float32))
         f, g = adv_function(mnist_input(test_x[orig_img]), adv_target_z, C)
-        #f, g = adv_function(mnist_input(test_x_app[orig_img]), adv_target_z, C)
+        #f and g are adversarial loss and gradient, respectively
         return float(f), g.flatten().astype(np.float64)
         
     # Noise bounds (pixels cannot exceed 0-1)
@@ -329,7 +287,8 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
     x, f, d = scipy.optimize.fmin_l_bfgs_b(fmin_func, l_noise.b.get_value().flatten(), bounds = bounds, fprime = None, factr = 10, m = 25)
     
     adv_img = adv_plot(mnist_input(test_x[orig_img]))[0]
-    #adv_img = adv_plot(mnist_input(test_x_app[orig_img]))[0]
+    #doubt: how is the optimal noise added to the original image!?
+    #adv_img is the image reconstructed by the AE from the adversarial image?
     
     orig_dist = mnist_dist(adv_img, test_x[orig_img])
     adv_dist = mnist_dist(adv_img, test_x[target_img])
@@ -337,11 +296,6 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
     #orig_dist should be small
     #adv_dist should be big
     #for good attacker
-    
-    
-    #orig_dist = mnist_dist(adv_img, test_x_app[orig_img])
-    #adv_dist = mnist_dist(adv_img, test_x_app[target_img])
-    #recon_dist = mnist_dist(adv_img, test_x_app[orig_img]+x)
     
     # Plotting results
     
@@ -504,8 +458,8 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
         plt.axvline(x=orig_reconstruction_dist, linewidth = 2, color='DarkOrange', label = "Dist(Original reconstruction - Original)")
         plt.scatter(orig_dist, adv_dist)
         plt.scatter([best_orig_dist], [best_adv_dist], color = "red")
-        plt.xlabel("Dist(reconstructed Adversarial image - Original image)")
-        plt.ylabel("Dist(reconstructed Adversarial image - Target image)")
+        plt.xlabel("Dist(recon Adversarial image, Original image)")
+        plt.ylabel("Dist(recon Adversarial image, Target image)")
         plt.legend()
         plt.plot()
         #output_dir = '/Users/rishikaagarwal/Desktop/cs597/adv_vae-master/results/' + model_filename + '/'
@@ -519,8 +473,8 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
         plt.axvline(x=np.linalg.norm(test_x[orig_img]-test_x[target_img]), linewidth = 2, color='DarkOrange', label = "Dist(Original - Target)")
         plt.scatter(noise_dist, adv_dist)
         plt.scatter([best_noise], [best_adv_dist], color = "red")
-        plt.ylabel("Dist(reconstructed Adversarial image - Target image)")
-        plt.xlabel("Dist(noise)")
+        plt.ylabel("Dist(reconAdversarial image, Target image)")
+        plt.xlabel("noise")
         plt.legend()
         fig.savefig(os.path.join(output_dir, ('exp_'+ str(iteration)+ 'graph2.png')))
         plt.plot()
@@ -529,26 +483,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
         #compute AUDDC
 
        
-        xs = noise_dist/ orig_target_dist
-        zs = (
-            (adv_dist- target_recon_dist) /
-            (orig_target_recon_dist - target_recon_dist)
-        )
-       
-
-        idx = np.argsort(xs)
-        xs = xs[idx]
-        zs = zs[idx]
-        
-
-        (xs, zs) = zip(*[(x, z) for (x, z)
-                               in zip(xs, zs) if x >= 0 and x <= 1])
-        points = (xs, zs)
-        limits = (1.0, 1.0, 0)
-
-        AUDDC = metrics_auc(points, limits)
-
-        print("AUDDC: ", AUDDC)
+    
 
     #orig_img : index of original image
     #target_img : index of target image
@@ -559,14 +494,29 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     #orig_dist : 
     #adv_dist :
 
+    xs = noise_dist/ orig_target_dist
+    zs = (
+        (adv_dist- target_recon_dist) /
+        (orig_target_recon_dist - target_recon_dist)
+    )
+    idx = np.argsort(xs)
+    xs = xs[idx]
+    zs = zs[idx]
+    (xs, zs) = zip(*[(x, z) for (x, z)
+                           in zip(xs, zs) if x >= 0 and x <= 1])
+    points = (xs, zs)
+    limits = (1.0, 1.0, 0)
+    AUDDC = metrics_auc(points, limits)
+
     bestCind = np.where(C==bestC)
+    
     print('orig_img : ',orig_img)
     print('target_img : ', target_img)
-    print('orig_reconstruction_dist : ', orig_reconstruction_dist)
-    print('target_reconstruction_dist : ',target_reconstruction_dist)
-    print('original_target_dist : ', orig_target_dist[bestCind])
-    print('orig_target_recon_dist : ', orig_target_recon_dist[bestCind])
-    print('target_orig_recon_dist : ', target_orig_recon_dist[bestCind])
+    #print('orig_reconstruction_dist : ', orig_reconstruction_dist)
+    #print('target_reconstruction_dist : ',target_reconstruction_dist)
+    #print('original_target_dist : ', orig_target_dist[bestCind])
+    #print('orig_target_recon_dist : ', orig_target_recon_dist[bestCind])
+    #print('target_orig_recon_dist : ', target_orig_recon_dist[bestCind])
 
     print()
     print('bestC : ', bestC)
@@ -574,11 +524,9 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     print('best noise_dist :  ', noise_dist[bestCind])
     print('best orig_dist :  ', orig_dist[bestCind])
     print('best adv_dist : ', adv_dist[bestCind])
+    print('AUDDC: ', AUDDC)
     print()
-   
-    #print('C', np.mean(C))
-                        
-                        
+                      
     df = pd.DataFrame({'orig_img': orig_img,
                        'target_img': target_img,
                        'bestC': bestC,
@@ -598,16 +546,6 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
                         })
     
     return df
-
-
-# In[47]:
-
-
-#print(len(test_x))
-#print(len(train_x))
-
-
-# In[49]:
 
 
 n = num_test_attacks
@@ -630,19 +568,14 @@ for i in range(n):
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
-    df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
+    #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
 print("Average noise added: ", sum(bn)/len(bn))
-# In[50]:
-
-
-# add adversarial examples to the training set and check if attacks are still effective
-
+print("=====================================================")
 def gen_adv_ex(orig_img, target_img, C):
     
-   
     # Set the adversarial noise to zero
     l_noise.b.set_value(np.zeros((784,)).astype(np.float32))
     
@@ -650,7 +583,6 @@ def gen_adv_ex(orig_img, target_img, C):
     adv_target_z = adv_l_z(mnist_input(train_x[target_img]))
     adv_target_z = adv_target_z[0]
 
-    
     # Initialize the adversarial noise for the optimization procedure
     l_noise.b.set_value(np.random.uniform(-1e-8, 1e-8, size=(784,)).astype(np.float32))
     
@@ -680,11 +612,6 @@ def gen_adv_ex(orig_img, target_img, C):
                
     return returns
 
-
-
-# In[51]:
-
-
 def gen_adv_ex_set(N, train_set):
     #N = 400
     or_ex_x = []
@@ -701,7 +628,7 @@ def gen_adv_ex_set(N, train_set):
 
     img_num = 0
     for i in range(N):
-        if(i%10==0):
+        if(i%50==0):
             print("generating ",i,"th adversarial example")
 
 
@@ -786,31 +713,35 @@ def gen_adv_ex_set(N, train_set):
 # In[57]:
 def append_adv_ex():
     N = num_adv_train
+    beg = time.time()
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
+    end = time.time()
     M = 60000-N
-    print(np.shape(a_x))
-    print(np.shape(train_x))
+    #print(np.shape(a_x))
+    #print(np.shape(train_x))
     train_x_desired_app = np.concatenate((train_x[0:M], o_x), axis = 0)
     train_x_app = np.concatenate((train_x[0:M], a_x), axis = 0)
     train_y_app = np.concatenate((train_y[0:M], a_y), axis = 0)
-    print(np.shape(train_x_app))
-    print(np.shape(train_y_app))
-    
+    #print(np.shape(train_x_app))
+    #print(np.shape(train_y_app))
+    print("Time taken to generate ",N, " adversarial examples: ", end-beg)
     return (train_x_desired_app, train_x_app, train_y_app)
 
 # In[58]:
 def append_adv_test_ex():
     N = num_adv_test
+    beg = time.time()
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
+    end = time.time()
     M = 4000-N
-    print(np.shape(a_x))
-    print(np.shape(train_x))
+    #print(np.shape(a_x))
+    #print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
     test_x_app = np.concatenate((test_x[0:M], a_x), axis = 0)
     test_y_app = np.concatenate((test_y[0:M], a_y), axis = 0)
-    print(np.shape(test_x_app))
-    print(np.shape(test_y_app))
-    
+    #print(np.shape(test_x_app))
+    #print(np.shape(test_y_app))
+    print("Time taken to generate ",N, " adversarial examples: ", end-beg)
     return (test_x_desired_app, test_x_app, test_y_app)
 
 train_x_desired_app, train_x_app, train_y_app = append_adv_ex()
@@ -830,15 +761,11 @@ batch_size = 20
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 25 #50
+num_epochs = 15 #50
 model_filename = "mnist_ae_adv_trained"
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
-
-
-# In[65]:
-
 
 #SYMBOLIC VARS
 sym_x = T.matrix()
@@ -856,10 +783,6 @@ nfeatures=train_x_app.shape[1]
 n_train_batches = int(train_x_app.shape[0] / batch_size)
 n_test_batches = int(test_x_app.shape[0] / batch_size)
 
-
-# In[66]:
-
-
 ### RECOGNITION MODEL q(z|x)
 l_in = lasagne.layers.InputLayer((batch_size, nfeatures))
 l_noise = lasagne.layers.BiasLayer(l_in, b = np.zeros(nfeatures, dtype = np.float32), name = "NOISE")
@@ -869,20 +792,12 @@ l_enc_h1 = lasagne.layers.DenseLayer(l_enc_h1, num_units=nhidden, nonlinearity=n
 
 l_z = lasagne.layers.DenseLayer(l_enc_h1, num_units=latent_size, nonlinearity=lasagne.nonlinearities.identity, name='Z')
 
-
-# In[67]:
-
-
 ### GENERATIVE MODEL p(x|z)
 l_dec_h1 = lasagne.layers.DenseLayer(l_z, num_units=nhidden, nonlinearity=nonlin, name='DEC_DENSE2')
 l_dec_h1 = lasagne.layers.DenseLayer(l_dec_h1, num_units=nhidden, nonlinearity=nonlin, name='DEC_DENSE1')
 l_dec_x = lasagne.layers.DenseLayer(l_dec_h1, num_units=nfeatures, nonlinearity=lasagne.nonlinearities.sigmoid, name='DEC_X_MU')
 
 dec_x = lasagne.layers.get_output(l_dec_x, sym_x, deterministic=False)
-
-
-# In[68]:
-
 
 loss = lasagne.objectives.squared_error(dec_x, sym_x_desired.reshape((batch_size, -1)))
 loss = lasagne.objectives.aggregate(loss, mode="mean")
@@ -900,10 +815,6 @@ clip_grad = 1
 max_norm = 5
 mgrads = lasagne.updates.total_norm_constraint(grads,max_norm=max_norm)
 cgrads = [T.clip(g,-clip_grad, clip_grad) for g in mgrads]
-
-
-# In[69]:
-
 
 #Setup the theano functions
 sym_batch_index = T.iscalar('index')
@@ -934,10 +845,6 @@ def test_epoch():
         cost_batch = test_model(i)
         costs += [cost_batch]
     return np.mean(costs)
-
-
-# In[70]:
-
 
 if do_train_model:
     # Training Loop
@@ -970,18 +877,8 @@ if do_train_model:
     
     print ("Write model data")
     write_model(l_dec_x, model_filename)
-else:
-    read_model(l_dec_x, model_filename)
-
-
-# In[71]:
-
 
 read_model(l_dec_x, model_filename)
-
-
-# In[72]:
-
 
 l_z, reconstruction = lasagne.layers.get_output([l_z, l_dec_x], inputs = sym_x, deterministic=True)
 # Adversarial confusion cost function
@@ -1035,8 +932,9 @@ for i in range(n):
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
-    df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
+    #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
 
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
 print("Average noise added: ", sum(bn)/len(bn))
+print("=====================================================")
