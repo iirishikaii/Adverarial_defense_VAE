@@ -34,8 +34,8 @@ import sys
 
 theano.config.floatX = 'float32'
 num_test_attacks = int(sys.argv[1])
-num_adv_train = int(sys.argv[1])
-num_adv_test = int(sys.argv[1])
+num_adv_train = int(sys.argv[2])
+num_adv_test = int(sys.argv[3])
 
 def now():
     return mktime(gmtime())
@@ -67,12 +67,13 @@ print("train_x shape: ", np.shape(train_x))
 print("test_x_shape: ", np.shape(test_x))
 
 #binariztion 
+if(sys.argsv[4]=='bin'):
+    
+    train_x[train_x > 0.5] = 1.0
+    train_x[train_x <= 0.5] = 0.0
 
-train_x[train_x > 0.5] = 1.0
-train_x[train_x <= 0.5] = 0.0
-
-test_x[test_x > 0.5] = 1.0
-test_x[test_x <= 0.5] = 0.0
+    test_x[test_x > 0.5] = 1.0
+    test_x[test_x <= 0.5] = 0.0
 
 #setup shared variables
 sh_x_train = theano.shared(train_x, borrow=True)
