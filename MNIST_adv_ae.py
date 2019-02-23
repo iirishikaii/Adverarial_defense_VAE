@@ -6,6 +6,8 @@
 # Implements a variational autoencoder as described in Kingma et al. 2013
 # "Auto-Encoding Variational Bayes"
 
+#python3 MNIST_adv_ae.py num_test_attacks num_adv_train num_adv_test bin/no_bin
+
 import numpy as np
 import pandas as pd
 import lasagne
@@ -67,8 +69,8 @@ print("train_x shape: ", np.shape(train_x))
 print("test_x_shape: ", np.shape(test_x))
 
 #binariztion 
-if(sys.argsv[4]=='bin'):
-    
+if(sys.argv[4]=='bin'):
+
     train_x[train_x > 0.5] = 1.0
     train_x[train_x <= 0.5] = 0.0
 
