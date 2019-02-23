@@ -3,6 +3,7 @@
 
 # In[1]:
 
+#python3 mnist_adv_vae.py num_test_attacks num_adv_train num_adv_test bin/no_bin
 
 #get_ipython().run_line_magic('matplotlib', 'inline')
 # -*- coding: utf-8 -*-
@@ -40,8 +41,8 @@ import sys
 
 # In[2]:
 num_test_attacks = int(sys.argv[1])
-num_adv_train = int(sys.argv[1])
-num_adv_test = int(sys.argv[1])
+num_adv_train = int(sys.argv[2])
+num_adv_test = int(sys.argv[3])
 
 def now():
     return mktime(gmtime())
@@ -70,11 +71,12 @@ print ("Using MNIST dataset")
 train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
 test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 
-train_x[train_x > 0.5] = 1.0
-train_x[train_x <= 0.5] = 0.0
+if(sys.argsv[4]=='bin'):
+    train_x[train_x > 0.5] = 1.0
+    train_x[train_x <= 0.5] = 0.0
 
-test_x[test_x > 0.5] = 1.0
-test_x[test_x <= 0.5] = 0.0
+    test_x[test_x > 0.5] = 1.0
+    test_x[test_x <= 0.5] = 0.0
 
 #setup shared variables
 sh_x_train = theano.shared(train_x, borrow=True)
