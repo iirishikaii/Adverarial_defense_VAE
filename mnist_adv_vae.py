@@ -71,7 +71,7 @@ print ("Using MNIST dataset")
 train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
 test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 
-if(sys.argsv[4]=='bin'):
+if(sys.argv[4]=='bin'):
     train_x[train_x > 0.5] = 1.0
     train_x[train_x <= 0.5] = 0.0
 
