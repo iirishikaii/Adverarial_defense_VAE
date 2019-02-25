@@ -45,7 +45,7 @@ batch_size = 100
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 25 #50
+num_epochs = 50 #50
 model_filename = "mnist_ae"
 nonlin = lasagne.nonlinearities.rectify
 
