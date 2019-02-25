@@ -9,9 +9,12 @@ dataset = sys.argv[1]
 if(dataset == "svhn"):
     dir1 = "results/compare_attacks/svhn_conv_ae/"
     dir2 = "results/compare_attacks/svhn_ae_adv_trained/"
-if(dataset == "mnist"):
+if(dataset == "mnist_ae"):
     dir1 = "results/compare_attacks/mnist_ae/"
     dir2 = "results/compare_attacks/mnist_ae_adv_trained/"
+if(dataset == "mnist_vae"):
+    dir1 = "results/compare_attacks/mnist_vae/"
+    dir2 = "results/compare_attacks/mnist_vae_adv_trained/"
 
 cover = Image.open(dir1 + str(0) + ".png")
 width, height = cover.size
@@ -42,8 +45,10 @@ for i in range(0,15):
     y_coord = y_coord + 220
 if(dataset == "svhn"):
     pdfFileName = "compiled_results_svhn"
-if(dataset == "mnist"):
-    pdfFileName = "compiled_results_mnist"
+if(dataset == "mnist_ae"):
+    pdfFileName = "compiled_results_mnist_ae"
+if(dataset == "mnist_vae"):
+    pdfFileName = "compiled_results_mnist_vae"
 
 dir = "results/compare_attacks/"
 pdf.output(dir + pdfFileName + ".pdf", "F")
