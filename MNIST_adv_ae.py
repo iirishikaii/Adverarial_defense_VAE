@@ -1,11 +1,3 @@
-
-# coding: utf-8
-#get_ipython().run_line_magic('matplotlib', 'inline')
-# -*- coding: utf-8 -*-
-
-# Implements a variational autoencoder as described in Kingma et al. 2013
-# "Auto-Encoding Variational Bayes"
-
 #python3 MNIST_adv_ae.py num_test_attacks num_adv_train num_adv_test bin/no_bin
 
 import numpy as np
@@ -32,12 +24,17 @@ from time import mktime, gmtime
 from PIL import Image
 import pickle
 from sklearn.metrics import auc
+from skimage.filters.rank import mean
+from skimage.morphology import disk
 import sys
 
 theano.config.floatX = 'float32'
 num_test_attacks = int(sys.argv[1])
 num_adv_train = int(sys.argv[2])
 num_adv_test = int(sys.argv[3])
+
+bin_for_adv = True
+mean_for_adv = True
 
 def now():
     return mktime(gmtime())
@@ -67,7 +64,8 @@ train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
 test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 print("train_x shape: ", np.shape(train_x))
 print("test_x_shape: ", np.shape(test_x))
-
+ltrain = np.shape(train_x)[0]
+ltest = np.shape(test_x)[0]
 #binariztion 
 if(sys.argv[4]=='bin'):
 
@@ -76,6 +74,13 @@ if(sys.argv[4]=='bin'):
 
     test_x[test_x > 0.5] = 1.0
     test_x[test_x <= 0.5] = 0.0
+
+if(sys.argv[4]=='mean_filter'):
+    radius = 2
+    train_x_list = [mean(train_x[i], disk(radius)) for i in range(0, ltrain)]
+    train_x = np.asarray(train_x_list)
+    test_x_list = [mean(test_x[i], disk(radius)) for i in range(0, ltest)]
+    test_x = np.asarray(test_x_list)
 
 #setup shared variables
 sh_x_train = theano.shared(train_x, borrow=True)
@@ -690,11 +695,14 @@ def gen_adv_ex_set(N, train_set):
 
         img_num+=1
         '''
-        '''
+        
         adv_im = train_x[orig_img] + best_noise_matrix
         adv_im = np.reshape(adv_im, (28,28))
         adv_im = np.clip(adv_im, 0, 1)
         matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')), adv_im, cmap = 'Greys_r')
+        adv_im[adv_im>0.5] = 1
+        adv_im[adv_im<=0.5]= 0
+        matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'_bin.png')), adv_im, cmap = 'Greys_r')
         orig_im = train_x[orig_img]
         orig_im = np.clip(orig_im, 0, 1)
         orig_im = np.reshape(orig_im, (28,28))
@@ -710,7 +718,7 @@ def gen_adv_ex_set(N, train_set):
     with open(f2, 'wb') as f:
         pickle.dump(adv_ex_y_target,f)
     f.close()
-    '''
+    
     return (or_ex_x, adv_ex_x, adv_ex_y_true)
 
 # In[57]:
@@ -718,7 +726,21 @@ def append_adv_ex():
     N = num_adv_train
     beg = time.time()
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = True)
+    a_x = np.array(a_x)
     end = time.time()
+    '''
+    if(sys.argv[4]=='bin' and bin_for_adv == True):
+
+        a_x[a_x > 0.5] = 1.0
+        a_x[a_x <= 0.5] = 0.0
+
+    if(sys.argv[4]=='mean_filter' and mean_for_adv==True):
+        radius = 2
+        l = np.shape(a_x)[0]
+        a_x_list = [mean(a_x[i], disk(radius)) for i in range(0, l)]
+        a_x = np.asarray(a_x_list)
+    ''' 
+    
     M = 60000-N
     #print(np.shape(a_x))
     #print(np.shape(train_x))
@@ -735,7 +757,19 @@ def append_adv_test_ex():
     N = num_adv_test
     beg = time.time()
     o_x, a_x, a_y = gen_adv_ex_set(N, train_set = False)
+    a_x = np.array(a_x)
     end = time.time()
+    '''
+    if(sys.argv[4]=='bin' and bin_for_adv == True):
+
+        a_x[a_x > 0.5] = 1.0
+        a_x[a_x <= 0.5] = 0.0
+    if(sys.argv[4]=='mean_filter' and mean_for_adv==True):
+        radius = 2
+        l = np.shape(a_x)[0]
+        a_x_list = [mean(a_x[i], disk(radius)) for i in range(0, l)]
+        a_x = np.asarray(a_x_list)
+    '''
     M = 4000-N
     #print(np.shape(a_x))
     #print(np.shape(train_x))
@@ -764,7 +798,7 @@ batch_size = 20
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 15 #50
+num_epochs = 25 #50
 model_filename = "mnist_ae_adv_trained"
 nonlin = lasagne.nonlinearities.rectify
 
@@ -907,13 +941,13 @@ adv_plot = theano.function([sym_x], reconstruction)
 # Function to get latent variables of the target
 adv_l_z = theano.function([sym_x], l_z)
 
-print("############################################################")
-print("############################################################")
-# In[73]:
+print("=====================================================")
+print("=====================================================")
 print()
 print("After Adversarial Training")
-print("############################################################")
-print("############################################################")
+print()
+print("=====================================================")
+print("=====================================================")
 print()
 
 n = num_test_attacks
@@ -931,7 +965,7 @@ for i in range(n):
     auddc_list.append(AUDDC)
     time_taken.append(end_time-start_time)
     print ("Iter", i, "Time", end_time - start_time, "sec")
-    print("############################################################")
+    print("-----------------------------------------------------------")
     #print(df.values)
     #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
     #np.savetxt(f, df.values, fmt = "%d")
