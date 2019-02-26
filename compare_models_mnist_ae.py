@@ -15,6 +15,8 @@ import pylab as plt
 from read_write_model import read_model, write_model
 from time import mktime, gmtime
 import random
+from skimage.filters.rank import mean
+from skimage.morphology import disk
 import sys
 
 theano.config.floatX = 'float32'
@@ -47,14 +49,14 @@ print ("Using MNIST dataset")
 train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
 test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 
-train_x[train_x > 0.5] = 1.0
-train_x[train_x <= 0.5] = 0.0
+#train_x[train_x > 0.5] = 1.0
+#train_x[train_x <= 0.5] = 0.0
 
-test_x[test_x > 0.5] = 1.0
-test_x[test_x <= 0.5] = 0.0
+#test_x[test_x > 0.5] = 1.0
+#test_x[test_x <= 0.5] = 0.0
 
 #setup shared variables
-sh_x_train = theano.shared(train_x, borrow=True)
+#sh_x_train = theano.shared(train_x, borrow=True)
 sh_x_test = theano.shared(test_x, borrow=True)
 
 nfeatures=train_x.shape[1]
@@ -108,22 +110,22 @@ batch_slice = slice(sym_batch_index * batch_size, (sym_batch_index + 1) * batch_
 
 updates = lasagne.updates.adam(cgrads, params, learning_rate=sym_lr)
 
-train_model = theano.function([sym_batch_index, sym_lr], loss, updates=updates,
-                              givens={sym_x: sh_x_train[batch_slice]},)
+#train_model = theano.function([sym_batch_index, sym_lr], loss, updates=updates,
+ #                             givens={sym_x: sh_x_train[batch_slice]},)
 
 test_model = theano.function([sym_batch_index], loss,
                              givens={sym_x: sh_x_test[batch_slice]},)
 
 plot_results = theano.function([sym_batch_index], dec_x,
                                givens={sym_x: sh_x_test[batch_slice]},)
-
+'''
 def train_epoch(lr):
     costs = []
     for i in range(n_train_batches):
         cost_batch = train_model(i, lr)
         costs += [cost_batch]
     return np.mean(costs)
-
+'''
 
 def test_epoch():
     costs = []
@@ -133,30 +135,7 @@ def test_epoch():
     return np.mean(costs)
 
 
-# In[11]:
-
-
-if do_train_model:
-    # Training Loop
-    for epoch in range(num_epochs):
-        start = time.time()
-        
-        #shuffle train data, train model and test model
-        np.random.shuffle(train_x)
-        sh_x_train.set_value(train_x)
-        
-        train_cost = train_epoch(lr)
-        test_cost = test_epoch()
-        
-        t = time.time() - start
-        
-        line =  "*Epoch: %i\tTime: %0.2f\tLR: %0.5f\tLL Train: %0.3f\tLL test: %0.3f\t" % ( epoch, t, lr, train_cost, test_cost)
-        print (line)
-    
-    print ("Write model data")
-    write_model(l_dec_x, model_filename)
-else:
-    read_model(l_dec_x, model_filename)
+read_model(l_dec_x, model_filename)
 
 def show_mnist(img, i, title=""): # expects flattened image of shape (3072,)
     img = img.copy().reshape(28, 28)
@@ -419,22 +398,28 @@ for iteration in range(n):
     noise = (df.at[0,'noise'])[0]
     adv_im = (df.at[0, 'adv_im'])[0]
     adv_recon = (df.at[0, 'adv_recon'])[0]
-    adv_bin = adv_im.copy()
-    (train_x.reshape((-1, 784))/255.0).astype(np.float32)
-    #binarize adv_im
-    adv_bin = (adv_bin.reshape((-1, 784))).astype(np.float32)
-    adv_bin[adv_bin>0.5]= 1
-    adv_bin[adv_bin<=0.5] = 0
+    if(sys.argv[2]=='bin'):
+        adv_bin = adv_im.copy()
+        adv_bin = (adv_bin.reshape((-1, 784))).astype(np.float32)
+        adv_bin[adv_bin>0.5]= 1
+        adv_bin[adv_bin<=0.5] = 0
+        l_noise.b.set_value(np.zeros((784,)).astype(np.float32))
+        adv_bin_recon = adv_plot(mnist_input(adv_bin))[0]
+        adv_bin_recon = (adv_bin_recon/255.0).astype(np.float32)
+
+    if(sys.argv[2]=='mean_filter'):
+        
+        radius = 1
+        adv_mean= mean(adv_im, disk(radius))
+       # adv_mean = (adv_mean.reshape((-1, 784))).astype(np.float32)
+        l_noise.b.set_value(np.zeros((784,)).astype(np.float32))
+        adv_mean_recon = adv_plot(mnist_input(adv_mean))[0]
+        adv_mean_recon = (adv_mean_recon/255.0).astype(np.float32)
+        orig_mean = mean(orig.copy().reshape(28,28), disk(radius))
     
     #print("adv_bin shape: ", adv_bin.shape)
     #adv_bin_recon = lasagne.layers.get_output(l_dec_x, adv_bin, deterministic = True)
-    l_noise.b.set_value(np.zeros((784,)).astype(np.float32))
-    adv_bin_recon = adv_plot(mnist_input(adv_bin))[0]
-    #print("type of adv_bin_recon: ", type(adv_bin_recon))
-    #adv_bin_recon = adv_bin_recon.eval()
-    print("adv_bin_recon shape: ",adv_bin_recon.shape)
-    #print(adv_bin_recon[0])
-    adv_bin_recon = (adv_bin_recon/255.0).astype(np.float32)
+    
     #print("type of adv_bin_recon: ", type(adv_bin_recon))
     fig = plt.figure(figsize=(10,10))
         
@@ -442,8 +427,8 @@ for iteration in range(n):
     i = 1
     title = "Original Image"
     img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
+    #img = np.clip(img, 0, 1)
+    plt.subplot(5, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -453,8 +438,8 @@ for iteration in range(n):
     i = 2
     title = "Original Reconstruction"
     img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
+    #img = np.clip(img, 0, 1)
+    plt.subplot(5, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -463,8 +448,8 @@ for iteration in range(n):
     i = 3
     title = "Adversarial noise"
     img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
+    #img = np.clip(img, 0, 1)
+    plt.subplot(5, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -475,8 +460,8 @@ for iteration in range(n):
     i = 4
     title = "Target image"
     img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
+    #img = np.clip(img, 0, 1)
+    plt.subplot(5, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -487,8 +472,8 @@ for iteration in range(n):
     i = 5
     title = "Adversarial image"
     img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
+    #img = np.clip(img, 0, 1)
+    plt.subplot(5, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -500,33 +485,66 @@ for iteration in range(n):
     i = 6
     title = "Adversarial reconstruction"
     img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
+    #img = np.clip(img, 0, 1)
+    plt.subplot(5, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
 
-    img = adv_bin
-    i = 7
-    title = "Adversarial Binarized"
-    img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
-    plt.imshow(img, cmap='Greys_r')
-    plt.title(title)
-    plt.axis("off")
+    if(sys.argv[2]=='bin'):
+        img = adv_bin
+        i = 7
+        title = "Adversarial Binarized"
+        img = img.copy().reshape(28, 28)
+        #img = np.clip(img, 0, 1)
+        plt.subplot(5, 2, i)
+        plt.imshow(img, cmap='Greys_r')
+        plt.title(title)
+        plt.axis("off")
 
-    img = adv_bin_recon
-    i = 8
-    title = "Adversarial Binarized Reconstruction"
-    img = img.copy().reshape(28, 28)
-    img = np.clip(img, 0, 1)
-    plt.subplot(4, 2, i)
-    plt.imshow(img, cmap='Greys_r')
-    plt.title(title)
-    plt.axis("off")
+        img = adv_bin_recon
+        i = 8
+        title = "Adversarial Binarized Reconstruction"
+        img = img.copy().reshape(28, 28)
+        #img = np.clip(img, 0, 1)
+        plt.subplot(5, 2, i)
+        plt.imshow(img, cmap='Greys_r')
+        plt.title(title)
+        plt.axis("off")
 
-    output_dir = 'results/compare_attacks/' + model_filename +'/'
+    if(sys.argv[2]=='mean_filter'):
+        img = adv_mean
+        i = 7
+        title = "Adversarial Mean filtered"
+        #img = img.copy().reshape(28, 28)
+        #img = np.clip(img, 0, 1)
+        plt.subplot(5, 2, i)
+        plt.imshow(img, cmap='Greys_r')
+        plt.title(title)
+        plt.axis("off")
+
+        img = adv_mean_recon
+        i = 8
+        title = "Adversarial mean filtered Reconstruction"
+        img = img.copy().reshape(28, 28)
+        #img = np.clip(img, 0, 1)
+        plt.subplot(5, 2, i)
+        plt.imshow(img, cmap='Greys_r')
+        plt.title(title)
+        plt.axis("off")
+
+        img = orig_mean
+        i = 9
+        title = "orig mean"
+        #img = np.clip(img,0,1)
+        plt.subplot(5,2,i)
+        plt.imshow(img, cmap = 'Greys_r')
+        plt.title(title)
+        plt.axis("off")
+
+
+
+    output_dir = 'results/compare_attacks/' + model_filename +'_'+sys.argv[2]
     fig.savefig(os.path.join(output_dir, (str(iteration)+ '.png')))
     plt.close(fig)
     recon = lasagne.layers.get_output(l_dec_x, adv_im)

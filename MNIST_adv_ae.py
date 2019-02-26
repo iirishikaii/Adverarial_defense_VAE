@@ -6,11 +6,6 @@ import lasagne
 import theano
 import theano.tensor as T
 from theano import printing
-#from past import autotranslate
-#autotranslate(['parmesan'])
-#import parmesan
-#from parmesan.distributions import log_bernoulli, kl_normal2_stdnormal
-#from parmesan.layers import SimpleSampleLayer
 from keras.datasets import mnist
 import time, shutil, os
 import scipy
@@ -40,13 +35,16 @@ def now():
     return mktime(gmtime())
 
 #settings
-do_train_model = False #False
+if(sys.argv[4]=='mean' or sys.argv[4]=='bin'):
+    do_train_model = True
+else:
+    do_train_model = False
 batch_size = 100
 latent_size = 20
 nhidden = 512
 lr = 0.001
-num_epochs = 50 #50
-model_filename = "mnist_ae"
+num_epochs = 25 #50
+model_filename = "mnist_ae_"+sys.argv[4]
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
@@ -60,7 +58,7 @@ sym_lr = T.scalar('lr')
 print ("Using MNIST dataset")
 
 (train_x, train_y), (test_x, test_y) = mnist.load_data()
-train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
+
 test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 print("train_x shape: ", np.shape(train_x))
 print("test_x_shape: ", np.shape(test_x))
@@ -68,19 +66,20 @@ ltrain = np.shape(train_x)[0]
 ltest = np.shape(test_x)[0]
 #binariztion 
 if(sys.argv[4]=='bin'):
-
+    train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
     train_x[train_x > 0.5] = 1.0
     train_x[train_x <= 0.5] = 0.0
 
-    test_x[test_x > 0.5] = 1.0
-    test_x[test_x <= 0.5] = 0.0
+    #test_x[test_x > 0.5] = 1.0
+    #test_x[test_x <= 0.5] = 0.0
 
 if(sys.argv[4]=='mean_filter'):
     radius = 2
     train_x_list = [mean(train_x[i], disk(radius)) for i in range(0, ltrain)]
     train_x = np.asarray(train_x_list)
-    test_x_list = [mean(test_x[i], disk(radius)) for i in range(0, ltest)]
-    test_x = np.asarray(test_x_list)
+    train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
+    #test_x_list = [mean(test_x[i], disk(radius)) for i in range(0, ltest)]
+    #test_x = np.asarray(test_x_list)
 
 #setup shared variables
 sh_x_train = theano.shared(train_x, borrow=True)
@@ -185,14 +184,6 @@ if do_train_model:
     write_model(l_dec_x, model_filename)
 else:
     read_model(l_dec_x, model_filename)
-
-
-#try:
-#   import cPickle as pkl
-#except:
-#import pickle as pkl
-#with open("./params/mnist_model.params", 'rb') as f1:
- #   data1 = pkl.load(f1, encoding = 'latin1')
 
 def metrics_auc(points, limits):
     (noise_dist, adv_dist) = points
@@ -430,7 +421,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     target_orig_recon_dist=[]
 
     
-    C = np.logspace(-5, 20, 25, base = 2, dtype = np.float32)
+    C = np.logspace(-20, 20, 100, base = 2, dtype = np.float32)
     
     for c in C:
         noise, od, ad, ore, tre, recd, otd, otrd, tord = adv_test(orig_img, target_img, C=c, plot = False)
@@ -626,14 +617,14 @@ def gen_adv_ex_set(N, train_set):
     adv_ex_x = []
     adv_ex_y_target = []
     adv_ex_y_true = []
-    
+    '''
     if(train_set==True):
         file_path_adv = 'dataset/train/adversarial_images/'
         file_path_orig = 'dataset/train/original_images/'
     else:
         file_path_adv = 'dataset/test/adversarial_images/'
         file_path_orig = 'dataset/test/original_images/'
-
+    '''
     img_num = 0
     for i in range(N):
         if(i%50==0):
@@ -651,7 +642,7 @@ def gen_adv_ex_set(N, train_set):
         orig_dist = []
         adv_dist = []
         
-        C = np.logspace(-5, 20, 25, base = 2, dtype = np.float32)
+        C = np.logspace(-20, 20, 100, base = 2, dtype = np.float32)
         for c in C:
             noise, noise_matrix, od, ad = gen_adv_ex(orig_img, target_img, C = c)
             noise_dist.append(noise)
@@ -699,26 +690,26 @@ def gen_adv_ex_set(N, train_set):
         adv_im = train_x[orig_img] + best_noise_matrix
         adv_im = np.reshape(adv_im, (28,28))
         adv_im = np.clip(adv_im, 0, 1)
-        matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')), adv_im, cmap = 'Greys_r')
+        #matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'.png')), adv_im, cmap = 'Greys_r')
         adv_im[adv_im>0.5] = 1
         adv_im[adv_im<=0.5]= 0
-        matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'_bin.png')), adv_im, cmap = 'Greys_r')
+        #matplotlib.pyplot.imsave(os.path.join(file_path_adv,('img_'+str(img_num)+'_bin.png')), adv_im, cmap = 'Greys_r')
         orig_im = train_x[orig_img]
         orig_im = np.clip(orig_im, 0, 1)
         orig_im = np.reshape(orig_im, (28,28))
-        matplotlib.pyplot.imsave(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')), orig_im, cmap = 'Greys_r')
+        #matplotlib.pyplot.imsave(os.path.join(file_path_orig,('img_'+str(img_num)+'.png')), orig_im, cmap = 'Greys_r')
         img_num+=1
 
-    f1 = file_path_adv + "true_label.p"
-    f2 = file_path_adv + "target_label.p"
-
+    #f1 = file_path_adv + "true_label.p"
+    #f2 = file_path_adv + "target_label.p"
+    '''
     with open(f1, 'wb') as f:
         pickle.dump(adv_ex_y_true,f)
     f.close()
     with open(f2, 'wb') as f:
         pickle.dump(adv_ex_y_target,f)
     f.close()
-    
+    '''
     return (or_ex_x, adv_ex_x, adv_ex_y_true)
 
 # In[57]:
@@ -799,7 +790,7 @@ latent_size = 20
 nhidden = 512
 lr = 0.001
 num_epochs = 25 #50
-model_filename = "mnist_ae_adv_trained"
+model_filename = "mnist_ae_adv_trained_"+sys.argv[4]
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
@@ -966,11 +957,7 @@ for i in range(n):
     time_taken.append(end_time-start_time)
     print ("Iter", i, "Time", end_time - start_time, "sec")
     print("-----------------------------------------------------------")
-    #print(df.values)
-    #f = "results/" + model_filename + "/exp_" + str(i) + ".txt"
-    #np.savetxt(f, df.values, fmt = "%d")
-    #df.to_csv("results/" + model_filename + "/exp_" + str(i) + ".csv", decimal=',', sep=' ', float_format='%.3f')
-
+    
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
 print("Average noise added: ", sum(bn)/len(bn))
