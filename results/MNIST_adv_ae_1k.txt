@@ -1,0 +1,224 @@
+--------------------------------------------------------------------------
+[[57796,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: CS597DLVM
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Using MNIST dataset
+train_x shape:  (60000, 784)
+test_x_shape:  (10000, 784)
+ENC_DENSE1.W (784, 512)
+ENC_DENSE1.b (512,)
+ENC_DENSE2.W (512, 512)
+ENC_DENSE2.b (512,)
+Z.W (512, 20)
+Z.b (20,)
+DEC_DENSE2.W (20, 512)
+DEC_DENSE2.b (512,)
+DEC_DENSE1.W (512, 512)
+DEC_DENSE1.b (512,)
+DEC_X_MU.W (512, 784)
+DEC_X_MU.b (784,)
+orig_img :  5138
+target_img :  2764
+
+bestC :  1579.2239
+adv_adv_recon_dist :  [7.89430976]
+best noise_dist :   [3.07312814]
+best orig_dist :   [8.780018]
+best adv_dist :  [8.731829]
+AUDDC:  0.3717108775647183
+
+Iter 0 Time 12.737718343734741 sec
+############################################################
+orig_img :  1554
+target_img :  1079
+
+bestC :  767.13324
+adv_adv_recon_dist :  [6.95088244]
+best noise_dist :   [4.04964598]
+best orig_dist :   [8.193178]
+best adv_dist :  [7.7879305]
+AUDDC:  0.29434402567889917
+
+Iter 1 Time 10.752773761749268 sec
+############################################################
+orig_img :  4378
+target_img :  997
+
+bestC :  767.13324
+adv_adv_recon_dist :  [8.4954346]
+best noise_dist :   [3.60936987]
+best orig_dist :   [9.30994]
+best adv_dist :  [7.10989]
+AUDDC:  0.24525302714782604
+
+Iter 2 Time 14.436558723449707 sec
+############################################################
+orig_img :  8472
+target_img :  1598
+
+bestC :  1579.2239
+adv_adv_recon_dist :  [7.77490869]
+best noise_dist :   [3.15676431]
+best orig_dist :   [9.070256]
+best adv_dist :  [8.018427]
+AUDDC:  0.2735855454612746
+
+Iter 3 Time 12.021004915237427 sec
+############################################################
+orig_img :  8339
+target_img :  4160
+
+bestC :  1579.2239
+adv_adv_recon_dist :  [7.14813427]
+best noise_dist :   [2.64563917]
+best orig_dist :   [7.9649096]
+best adv_dist :  [7.8206363]
+AUDDC:  0.2794120413703639
+
+Iter 4 Time 11.815593242645264 sec
+############################################################
+Average AUDDC:  0.2928611034446164
+Average time taken for attack:  12.352729797363281
+Average noise added:  3.305627547603496
+=====================================================
+generating  0 th adversarial example
+generating  50 th adversarial example
+generating  100 th adversarial example
+generating  150 th adversarial example
+generating  200 th adversarial example
+generating  250 th adversarial example
+generating  300 th adversarial example
+generating  350 th adversarial example
+generating  400 th adversarial example
+generating  450 th adversarial example
+generating  500 th adversarial example
+generating  550 th adversarial example
+generating  600 th adversarial example
+generating  650 th adversarial example
+generating  700 th adversarial example
+generating  750 th adversarial example
+generating  800 th adversarial example
+generating  850 th adversarial example
+generating  900 th adversarial example
+generating  950 th adversarial example
+Time taken to generate  1000  adversarial examples:  13499.783991575241
+generating  0 th adversarial example
+generating  50 th adversarial example
+Time taken to generate  100  adversarial examples:  1323.0464737415314
+ENC_DENSE1.W (784, 512)
+ENC_DENSE1.b (512,)
+ENC_DENSE2.W (512, 512)
+ENC_DENSE2.b (512,)
+Z.W (512, 20)
+Z.b (20,)
+DEC_DENSE2.W (20, 512)
+DEC_DENSE2.b (512,)
+DEC_DENSE1.W (512, 512)
+DEC_DENSE1.b (512,)
+DEC_X_MU.W (512, 784)
+DEC_X_MU.b (784,)
+Training Adversarial Model
+*Epoch: 0	Time: 10.03	LR: 0.00100	LL Train: 0.032	LL test: 0.023	
+*Epoch: 1	Time: 9.99	LR: 0.00100	LL Train: 0.021	LL test: 0.020	
+*Epoch: 2	Time: 10.00	LR: 0.00100	LL Train: 0.019	LL test: 0.020	
+*Epoch: 3	Time: 9.98	LR: 0.00100	LL Train: 0.018	LL test: 0.019	
+*Epoch: 4	Time: 9.98	LR: 0.00100	LL Train: 0.018	LL test: 0.018	
+*Epoch: 5	Time: 9.99	LR: 0.00100	LL Train: 0.017	LL test: 0.018	
+*Epoch: 6	Time: 10.00	LR: 0.00100	LL Train: 0.017	LL test: 0.018	
+*Epoch: 7	Time: 9.98	LR: 0.00100	LL Train: 0.016	LL test: 0.018	
+*Epoch: 8	Time: 10.00	LR: 0.00100	LL Train: 0.016	LL test: 0.017	
+*Epoch: 9	Time: 10.01	LR: 0.00100	LL Train: 0.016	LL test: 0.018	
+*Epoch: 10	Time: 10.01	LR: 0.00100	LL Train: 0.015	LL test: 0.017	
+*Epoch: 11	Time: 10.01	LR: 0.00100	LL Train: 0.015	LL test: 0.018	
+*Epoch: 12	Time: 10.02	LR: 0.00100	LL Train: 0.015	LL test: 0.017	
+*Epoch: 13	Time: 10.05	LR: 0.00100	LL Train: 0.015	LL test: 0.017	
+*Epoch: 14	Time: 10.07	LR: 0.00100	LL Train: 0.015	LL test: 0.017	
+*Epoch: 15	Time: 10.06	LR: 0.00100	LL Train: 0.015	LL test: 0.017	
+*Epoch: 16	Time: 10.07	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 17	Time: 10.08	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 18	Time: 10.08	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 19	Time: 10.06	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 20	Time: 10.06	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 21	Time: 10.07	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 22	Time: 10.18	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 23	Time: 10.24	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+*Epoch: 24	Time: 10.19	LR: 0.00100	LL Train: 0.014	LL test: 0.017	
+Write model data
+=====================================================
+=====================================================
+
+After Adversarial Training
+
+=====================================================
+=====================================================
+
+orig_img :  3464
+target_img :  5607
+
+bestC :  372.64722
+adv_adv_recon_dist :  [6.67954706]
+best noise_dist :   [1.23306711]
+best orig_dist :   [6.8584533]
+best adv_dist :  [4.9263477]
+AUDDC:  0.11427847954687133
+
+Iter 0 Time 7.292144060134888 sec
+-----------------------------------------------------------
+orig_img :  7833
+target_img :  1282
+
+bestC :  87.93304
+adv_adv_recon_dist :  [7.23739683]
+best noise_dist :   [2.61658038]
+best orig_dist :   [7.736886]
+best adv_dist :  [5.2957177]
+AUDDC:  0.1842461490007434
+
+Iter 1 Time 6.195035934448242 sec
+-----------------------------------------------------------
+orig_img :  1988
+target_img :  9495
+
+bestC :  181.01933
+adv_adv_recon_dist :  [7.35408894]
+best noise_dist :   [2.08734118]
+best orig_dist :   [7.748257]
+best adv_dist :  [5.439332]
+AUDDC:  0.17736301796081275
+
+Iter 2 Time 7.77822208404541 sec
+-----------------------------------------------------------
+orig_img :  8133
+target_img :  2178
+
+bestC :  181.01933
+adv_adv_recon_dist :  [9.1094098]
+best noise_dist :   [2.29558689]
+best orig_dist :   [9.561288]
+best adv_dist :  [5.916964]
+AUDDC:  0.15513905797341876
+
+Iter 3 Time 6.035879611968994 sec
+-----------------------------------------------------------
+orig_img :  6774
+target_img :  8075
+
+bestC :  181.01933
+adv_adv_recon_dist :  [7.14716219]
+best noise_dist :   [2.24525291]
+best orig_dist :   [7.655987]
+best adv_dist :  [6.863133]
+AUDDC:  0.19319867647876654
+
+Iter 4 Time 6.780449628829956 sec
+-----------------------------------------------------------
+Average AUDDC:  0.16484507619212257
+Average time taken for attack:  6.816346263885498
+Average noise added:  2.0964783698280085
+=====================================================
