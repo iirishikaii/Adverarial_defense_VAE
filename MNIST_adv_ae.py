@@ -1,4 +1,4 @@
-#python3 MNIST_adv_ae.py num_test_attacks num_adv_train num_adv_test bin/no_bin
+#python3 MNIST_adv_ae.py num_test_attacks num_adv_train num_adv_test bin/mean/none
 
 import numpy as np
 import pandas as pd
@@ -35,7 +35,7 @@ def now():
     return mktime(gmtime())
 
 #settings
-if(sys.argv[4]=='mean' or sys.argv[4]=='bin'):
+if(sys.argv[4]=='mean_filter' or sys.argv[4]=='bin'):
     do_train_model = True
 else:
     do_train_model = False
