@@ -1,3 +1,5 @@
+#python3 compare_models_mnist_ae.py mnist_ae_bin bin
+#python3 compare_models_mnist_ae.py mnist_ae_mean_filter mean_filter
 
 import numpy as np
 import pandas as pd
@@ -428,7 +430,7 @@ for iteration in range(n):
     title = "Original Image"
     img = img.copy().reshape(28, 28)
     #img = np.clip(img, 0, 1)
-    plt.subplot(5, 2, i)
+    plt.subplot(4, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -439,7 +441,7 @@ for iteration in range(n):
     title = "Original Reconstruction"
     img = img.copy().reshape(28, 28)
     #img = np.clip(img, 0, 1)
-    plt.subplot(5, 2, i)
+    plt.subplot(4, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -449,7 +451,7 @@ for iteration in range(n):
     title = "Adversarial noise"
     img = img.copy().reshape(28, 28)
     #img = np.clip(img, 0, 1)
-    plt.subplot(5, 2, i)
+    plt.subplot(4, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -461,7 +463,7 @@ for iteration in range(n):
     title = "Target image"
     img = img.copy().reshape(28, 28)
     #img = np.clip(img, 0, 1)
-    plt.subplot(5, 2, i)
+    plt.subplot(4, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -473,7 +475,7 @@ for iteration in range(n):
     title = "Adversarial image"
     img = img.copy().reshape(28, 28)
     #img = np.clip(img, 0, 1)
-    plt.subplot(5, 2, i)
+    plt.subplot(4, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -486,7 +488,7 @@ for iteration in range(n):
     title = "Adversarial reconstruction"
     img = img.copy().reshape(28, 28)
     #img = np.clip(img, 0, 1)
-    plt.subplot(5, 2, i)
+    plt.subplot(4, 2, i)
     plt.imshow(img, cmap='Greys_r')
     plt.title(title)
     plt.axis("off")
@@ -497,7 +499,7 @@ for iteration in range(n):
         title = "Adversarial Binarized"
         img = img.copy().reshape(28, 28)
         #img = np.clip(img, 0, 1)
-        plt.subplot(5, 2, i)
+        plt.subplot(4, 2, i)
         plt.imshow(img, cmap='Greys_r')
         plt.title(title)
         plt.axis("off")
@@ -507,7 +509,7 @@ for iteration in range(n):
         title = "Adversarial Binarized Reconstruction"
         img = img.copy().reshape(28, 28)
         #img = np.clip(img, 0, 1)
-        plt.subplot(5, 2, i)
+        plt.subplot(4, 2, i)
         plt.imshow(img, cmap='Greys_r')
         plt.title(title)
         plt.axis("off")
@@ -518,7 +520,7 @@ for iteration in range(n):
         title = "Adversarial Mean filtered"
         #img = img.copy().reshape(28, 28)
         #img = np.clip(img, 0, 1)
-        plt.subplot(5, 2, i)
+        plt.subplot(4, 2, i)
         plt.imshow(img, cmap='Greys_r')
         plt.title(title)
         plt.axis("off")
@@ -528,21 +530,12 @@ for iteration in range(n):
         title = "Adversarial mean filtered Reconstruction"
         img = img.copy().reshape(28, 28)
         #img = np.clip(img, 0, 1)
-        plt.subplot(5, 2, i)
+        plt.subplot(4, 2, i)
         plt.imshow(img, cmap='Greys_r')
         plt.title(title)
         plt.axis("off")
 
-        img = orig_mean
-        i = 9
-        title = "orig mean"
-        #img = np.clip(img,0,1)
-        plt.subplot(5,2,i)
-        plt.imshow(img, cmap = 'Greys_r')
-        plt.title(title)
-        plt.axis("off")
-
-
+        
 
     output_dir = 'results/compare_attacks/' + model_filename +'_'+sys.argv[2]
     fig.savefig(os.path.join(output_dir, (str(iteration)+ '.png')))
