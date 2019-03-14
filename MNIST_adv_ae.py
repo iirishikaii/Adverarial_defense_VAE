@@ -22,29 +22,34 @@ from sklearn.metrics import auc
 from skimage.filters.rank import mean
 from skimage.morphology import disk
 import sys
+from math import pow
 
 theano.config.floatX = 'float32'
-num_test_attacks = int(sys.argv[1])
-num_adv_train = int(sys.argv[2])
-num_adv_test = int(sys.argv[3])
-
-bin_for_adv = True
-mean_for_adv = True
+#num_test_attacks = int(sys.argv[1])
+#num_adv_train = int(sys.argv[2])
+#num_adv_test = int(sys.argv[3])
+num_test_attacks = 10
+num_adv_train = 1000
+num_adv_test = 100
+bin_for_adv = False
+mean_for_adv = False
 
 def now():
     return mktime(gmtime())
 
 #settings
-if(sys.argv[4]=='mean_filter' or sys.argv[4]=='bin'):
-    do_train_model = True
-else:
-    do_train_model = False
-batch_size = 100
-latent_size = 20
-nhidden = 512
+#if(sys.argv[4]=='mean_filter' or sys.argv[4]=='bin'):
+ #   do_train_model = True
+#else:
+do_train_model = True
+batch_size = 128
+latent_size = 100
+nhidden = 500
 lr = 0.001
-num_epochs = 25 #50
-model_filename = "mnist_ae_"+sys.argv[4]
+num_epochs = 10 #50
+#model_filename = "mnist_ae_"+sys.argv[4]
+model_filename = "mnist_ae_modified"
+
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
@@ -59,12 +64,13 @@ print ("Using MNIST dataset")
 
 (train_x, train_y), (test_x, test_y) = mnist.load_data()
 
-test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
+#test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
 print("train_x shape: ", np.shape(train_x))
 print("test_x_shape: ", np.shape(test_x))
 ltrain = np.shape(train_x)[0]
 ltest = np.shape(test_x)[0]
 #binariztion 
+'''
 if(sys.argv[4]=='bin'):
     train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
     train_x[train_x > 0.5] = 1.0
@@ -80,8 +86,11 @@ if(sys.argv[4]=='mean_filter'):
     train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
     #test_x_list = [mean(test_x[i], disk(radius)) for i in range(0, ltest)]
     #test_x = np.asarray(test_x_list)
-
+'''
 #setup shared variables
+train_x = (train_x.reshape((-1, 784))/255.0).astype(np.float32)
+test_x = (test_x.reshape((-1, 784))/255.0).astype(np.float32)
+
 sh_x_train = theano.shared(train_x, borrow=True)
 sh_x_test = theano.shared(test_x, borrow=True)
 sh_x_desired_train = theano.shared(train_x, borrow=True)
@@ -214,7 +223,7 @@ def mnist_input(img):
     return np.tile(img, (batch_size, 1, 1, 1)).reshape(batch_size, 784)
 
 def mnist_dist(img1, img2):
-    return np.linalg.norm(img1 - img2)
+    return pow(np.linalg.norm(img1 - img2),2)
 
 
 # In[14]:
@@ -289,8 +298,8 @@ def adv_test(orig_img = 0, target_img = 1, C = 200.0, plot = True):
     #doubt: how is the optimal noise added to the original image!?
     #adv_img is the image reconstructed by the AE from the adversarial image?
     
-    orig_dist = mnist_dist(adv_img, test_x[orig_img])
-    adv_dist = mnist_dist(adv_img, test_x[target_img])
+    orig_dist = mnist_dist(adv_img, test_x[orig_img]) #d1
+    adv_dist = mnist_dist(adv_img, test_x[target_img]) #d2
     recon_dist = mnist_dist(adv_img, test_x[orig_img]+x)
     #orig_dist should be small
     #adv_dist should be big
@@ -420,12 +429,13 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     orig_target_recon_dist=[]
     target_orig_recon_dist=[]
 
+    #lat_dist_orig = adv_l_z(test_x[orig_img]), adv_l_z(adv_plot(test_x[orig_img]))
     
     C = np.logspace(-20, 20, 100, base = 2, dtype = np.float32)
     
     for c in C:
         noise, od, ad, ore, tre, recd, otd, otrd, tord = adv_test(orig_img, target_img, C=c, plot = False)
-        noise_dist.append(noise)
+        noise_dist.append(pow(noise,2))
         orig_dist.append(od)
         adv_dist.append(ad)
         target_recon_dist.append(tre)
@@ -509,6 +519,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
 
     bestCind = np.where(C==bestC)
     
+
     print('orig_img : ',orig_img)
     print('target_img : ', target_img)
     #print('orig_reconstruction_dist : ', orig_reconstruction_dist)
@@ -518,11 +529,13 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
     #print('target_orig_recon_dist : ', target_orig_recon_dist[bestCind])
 
     print()
-    print('bestC : ', bestC)
-    print('adv_adv_recon_dist : ', recon_dist[bestCind])
+    #print('bestC : ', bestC)
+    #print('adv_adv_recon_dist : ', recon_dist[bestCind])
     print('best noise_dist :  ', noise_dist[bestCind])
-    print('best orig_dist :  ', orig_dist[bestCind])
-    print('best adv_dist : ', adv_dist[bestCind])
+    print('best orig_dist (d1):  ', orig_dist[bestCind])
+    print('best adv_dist (d2): ', adv_dist[bestCind])
+    #print('latent distance(orig): ', lat_dist_orig)
+    #print('latent distance(adv): ', lat_dist_adv)
     print('AUDDC: ', AUDDC)
     print()
                       
@@ -534,6 +547,8 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
                        'noise_dist': noise_dist,
                        'orig_dist': orig_dist,
                        'adv_dist': adv_dist,
+                       'best_orig_dist': best_orig_dist,
+                       'best_adv_dist': best_adv_dist,
                        'target_recon_dist': target_recon_dist,
                        'recon_dist': recon_dist,
                        'orig_target_dist': orig_target_dist,
@@ -541,7 +556,7 @@ def orig_adv_dist(orig_img = None, target_img = None, plot = False, bestC = None
                        'target_orig_recon_dist': target_orig_recon_dist,
                        'C': C,
                        'AUDDC':AUDDC,
-                       'best_noise': best_noise
+                       'best_noise': pow(best_noise,2)
                         })
     
     return df
@@ -551,6 +566,8 @@ n = num_test_attacks
 auddc_list = []
 time_taken = []
 bn = []
+d1_list = []
+d2_list = []
 
 for i in range(n):
     start_time = time.time()
@@ -558,9 +575,13 @@ for i in range(n):
     end_time = time.time()
     AUDDC = df.at[0,'AUDDC']
     best_noise = df.at[0,'best_noise']
+    d1 = df.at[0, 'best_orig_dist']
+    d2 = df.at[0, 'best_adv_dist']
     bn.append(best_noise)
     auddc_list.append(AUDDC)
     time_taken.append(end_time-start_time)
+    d1_list.append(d1)
+    d2_list.append(d2)
 
     print ("Iter", i, "Time", end_time-start_time, "sec")
     print("############################################################")
@@ -571,6 +592,8 @@ for i in range(n):
 
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
+print("Average d1: ", sum(d1_list)/len(d1_list))
+print("Average d2: ", sum(d2_list)/len(d2_list))
 print("Average noise added: ", sum(bn)/len(bn))
 print("=====================================================")
 def gen_adv_ex(orig_img, target_img, C):
@@ -790,7 +813,8 @@ latent_size = 20
 nhidden = 512
 lr = 0.001
 num_epochs = 25 #50
-model_filename = "mnist_ae_adv_trained_"+sys.argv[4]
+#model_filename = "mnist_ae_adv_trained_"+sys.argv[4]
+model_filename = "mnist_ae_adv_trained_modified"
 nonlin = lasagne.nonlinearities.rectify
 
 np.random.seed(1234) # reproducibility
