@@ -23,6 +23,7 @@ from skimage.filters.rank import mean
 from skimage.morphology import disk
 import sys
 from math import pow
+#import logging
 
 theano.config.floatX = 'float32'
 #num_test_attacks = int(sys.argv[1])
@@ -33,6 +34,9 @@ num_adv_train = 1000
 num_adv_test = 100
 bin_for_adv = False
 mean_for_adv = False
+
+#_logger = create_logger("train_ae")
+#_logger.setLevel(logging.INFO)
 
 def now():
     return mktime(gmtime())
@@ -46,7 +50,7 @@ batch_size = 128
 latent_size = 100
 nhidden = 500
 lr = 0.001
-num_epochs = 10 #50
+num_epochs = 25 #50
 #model_filename = "mnist_ae_"+sys.argv[4]
 model_filename = "mnist_ae_modified"
 
@@ -650,7 +654,8 @@ def gen_adv_ex_set(N, train_set):
     '''
     img_num = 0
     for i in range(N):
-        if(i%50==0):
+        if(i%100==0):
+            #_logger.info("generating " + str(i) + "th adversarial example")
             print("generating ",i,"th adversarial example")
 
 
@@ -784,7 +789,7 @@ def append_adv_test_ex():
         a_x_list = [mean(a_x[i], disk(radius)) for i in range(0, l)]
         a_x = np.asarray(a_x_list)
     '''
-    M = 4000-N
+    M = 10000-N
     #print(np.shape(a_x))
     #print(np.shape(train_x))
     test_x_desired_app = np.concatenate((test_x[0:M], o_x), axis = 0)
@@ -969,6 +974,8 @@ n = num_test_attacks
 auddc_list = []
 time_taken = []
 bn = []
+d1_list = []
+d2_list = []
 
 for i in range(n):
     start_time = time.time()
@@ -976,13 +983,19 @@ for i in range(n):
     end_time = time.time()
     AUDDC = df.at[0,'AUDDC']
     best_noise = df.at[0,'best_noise']
+    d1 = df.at[0, 'best_orig_dist']
+    d2 = df.at[0, 'best_adv_dist']
     bn.append(best_noise)
     auddc_list.append(AUDDC)
+    d1_list.append(d1)
+    d2_list.append(d2)
     time_taken.append(end_time-start_time)
     print ("Iter", i, "Time", end_time - start_time, "sec")
     print("-----------------------------------------------------------")
     
 print("Average AUDDC: ", sum(auddc_list)/len(auddc_list))
 print("Average time taken for attack: ", sum(time_taken)/len(time_taken))
+print("Average d1: ", sum(d1_list)/len(d1_list))
+print("Average d2: ", sum(d2_list)/len(d2_list))
 print("Average noise added: ", sum(bn)/len(bn))
 print("=====================================================")
